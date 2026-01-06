@@ -1,0 +1,181 @@
+:root{
+  --sv-border: rgba(17,24,39,.10);
+  --sv-text: #111827;
+  --sv-muted: rgba(17,24,39,.62);
+  --sv-surface: #ffffff;
+  --sv-soft: #fbfbfc;
+  --sv-radius: 16px;
+}
+
+.submit-visual{
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+  background: var(--sv-surface);
+  border: 1px solid var(--sv-border);
+  border-radius: var(--sv-radius);
+  padding: 16px;
+  text-align:left;
+}
+
+.submit-visual__header{
+  border: 1px solid rgba(17,24,39,.08);
+  background: linear-gradient(180deg, #fff, var(--sv-soft));
+  border-radius: 14px;
+  padding: 14px;
+}
+
+.submit-visual__header-top{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+}
+
+.submit-visual__title{
+  margin:0;
+  font-size:16px;
+  line-height:1.2;
+  color: var(--sv-text);
+  font-weight: 800;
+}
+
+.submit-visual__subtitle{
+  margin:6px 0 0 0;
+  font-size:13px;
+  color: var(--sv-muted);
+}
+
+.submit-visual__meta{
+  margin-top:10px;
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  font-size:13px;
+  color: var(--sv-muted);
+}
+
+.meta-label{color: var(--sv-muted); font-weight: 600;}
+.meta-value{color: var(--sv-text);}
+.meta-muted{color: var(--sv-muted);}
+
+.pill{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:6px 10px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:800;
+  border:1px solid transparent;
+  white-space:nowrap;
+}
+.pill-neutral{background: rgba(17,24,39,.06); color: var(--sv-text); border-color: rgba(17,24,39,.08);}
+.pill-success{background: rgba(20,120,60,.10); color:#14532d; border-color: rgba(20,120,60,.20);}
+.pill-danger{background: rgba(180,35,24,.10); color: var(--wine-main, #7a1a1a); border-color: rgba(180,35,24,.20);}
+
+.group{
+  border: 1px solid var(--sv-border);
+  border-radius: 14px;
+  padding: 12px;
+  background:#fff;
+}
+.group:disabled{opacity:.65}
+.group-title{
+  padding: 0 6px;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--sv-text);
+}
+
+.radio-grid{
+  margin-top:10px;
+  display:grid;
+  grid-template-columns: repeat(2, minmax(0,1fr));
+  gap:10px;
+}
+@media (min-width:720px){
+  .radio-grid{grid-template-columns: repeat(4, minmax(0,1fr));}
+}
+.radio-grid--5{
+  grid-template-columns: repeat(2, minmax(0,1fr));
+}
+@media (min-width:720px){
+  .radio-grid--5{grid-template-columns: repeat(5, minmax(0,1fr));}
+}
+
+.radio-card{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:8px;
+  padding:10px;
+  border-radius: 14px;
+  border: 1px solid rgba(17,24,39,.10);
+  background:#fff;
+  cursor:pointer;
+  user-select:none;
+  transition: transform .06s ease, box-shadow .15s ease, border-color .15s ease;
+}
+.radio-card:hover{
+  transform: translateY(-1px);
+  border-color: rgba(122,26,26,.25);
+  box-shadow: 0 10px 22px rgba(17,24,39,.08);
+}
+.radio-card:focus-within{
+  outline: none;
+  border-color: rgba(122,26,26,.45);
+  box-shadow: 0 0 0 4px rgba(122,26,26,.12);
+}
+.radio-card input[type="radio"]{
+  width:18px;
+  height:18px;
+  accent-color: var(--wine-main, #7a1a1a);
+}
+.radio-label{
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--sv-text);
+  text-align:center;
+}
+
+.submit-visual__submit{
+  width:100%;
+}
+
+/* Alerts */
+.alert{
+  border-radius: 14px;
+  padding: 12px;
+  border: 1px solid var(--sv-border);
+  background: #fff;
+}
+.alert-title{font-weight:900; color: var(--sv-text); margin-bottom: 6px;}
+.alert-body{color: var(--sv-muted); display:flex; flex-direction:column; gap:4px;}
+
+.alert-error{
+  border-color: rgba(180,35,24,.22);
+  background: rgba(180,35,24,.07);
+  color: var(--wine-main, #7a1a1a);
+}
+
+.alert-success{
+  border-color: rgba(20,120,60,.20);
+  background: rgba(20,120,60,.07);
+  color: #14532d;
+}
+
+/* Skeleton simples */
+.skeleton{
+  height:12px;
+  border-radius:999px;
+  background: linear-gradient(90deg, #f1f2f4, #e7e9ee, #f1f2f4);
+  background-size: 200% 100%;
+  animation: skeleton 1.1s ease-in-out infinite;
+}
+.skeleton--line{width:100%;}
+.skeleton--short{width:65%;}
+@keyframes skeleton{
+  0%{background-position:0% 0%}
+  100%{background-position:-200% 0%}
+}

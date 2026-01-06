@@ -1,6 +1,7 @@
 import { useMemo, useState, useEffect } from "react";
 import { apiPost, apiGet } from "../api/client";
 import type { ColorType, Limpidity, VisualEvaluationCreate, VisualEvaluationResponse } from "../types/visual";
+import "../styles/submit-visual.css";
 
 // Tom por cor
 const TONES: Record<ColorType, { label: string; value: string }[]> = {
@@ -75,6 +76,7 @@ export default function SubmitVisual({ participantId, eventId }: SubmitVisualPro
   // Fetch first open round for the event
   useEffect(() => {
     let mounted = true;
+
     async function fetchOpenRound() {
       setLoadingRound(true);
       try {
@@ -118,10 +120,7 @@ export default function SubmitVisual({ participantId, eventId }: SubmitVisualPro
 
     setLoading(true);
     try {
-      const res = await apiPost<VisualEvaluationCreate, VisualEvaluationResponse>(
-        "/visual-evaluations",
-        payload
-      );
+      const res = await apiPost<VisualEvaluationCreate, VisualEvaluationResponse>("/visual-evaluations", payload);
       setResult(res);
     } catch (err: any) {
       setError(err?.message ?? "Erro ao enviar");
@@ -131,84 +130,104 @@ export default function SubmitVisual({ participantId, eventId }: SubmitVisualPro
   }
 
   return (
-    <form
-      onSubmit={onSubmit}
-      style={{
-        display: "grid",
-        gap: 16,
-        backgroundColor: "#fff",
-        padding: 24,
-        borderRadius: 8,
-        boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
-      }}
-    >
-      {loadingRound ? (
-        <p>Carregando round...</p>
-      ) : roundId ? (
-        <>
-          <label>
-            Participant ID
-            <input value={participantIdState} readOnly style={{ width: "100%", padding: 8, borderRadius: 6, border: "1px solid #ccc", background: "#f7f7f7" }} />
-          </label>
+    <form onSubmit={onSubmit} className="submit-visual">
+      <header className="submit-visual__header">
+        <div className="submit-visual__header-top">
+          <div>
+            <h2 className="submit-visual__title">Avaliação Visual</h2>
+            <p className="submit-visual__subtitle">Selecione as opções e envie sua avaliação.</p>
+          </div>
 
-          <label>
-            Round
-            <input value={`${roundName} (${roundId})`} readOnly style={{ width: "100%", padding: 8, borderRadius: 6, border: "1px solid #ccc", background: "#f7f7f7" }} />
-          </label>
-        </>
-      ) : (
-        <p style={{ color: "#f66" }}>Nenhum round aberto para este evento</p>
+          {loadingRound ? (
+            <span className="pill pill-neutral">Carregando</span>
+          ) : roundId ? (
+            <span className="pill pill-success">Round aberto</span>
+          ) : (
+            <span className="pill pill-danger">Sem round</span>
+          )}
+        </div>
+
+        {loadingRound ? (
+          <div className="submit-visual__meta">
+            <div className="skeleton skeleton--line" />
+            <div className="skeleton skeleton--line skeleton--short" />
+          </div>
+        ) : roundId ? (
+          <div className="submit-visual__meta">
+            <div>
+              <span className="meta-label">Round:</span>{" "}
+              <strong className="meta-value">{roundName}</strong>{" "}
+              <span className="meta-muted">({roundId})</span>
+            </div>
+            <div>
+              <span className="meta-label">Participante:</span>{" "}
+              <strong className="meta-value">{participantIdState}</strong>
+            </div>
+          </div>
+        ) : (
+          <div className="submit-visual__meta">
+            <span className="meta-muted">Nenhum round aberto para este evento.</span>
+          </div>
+        )}
+      </header>
+
+      {error && (
+        <div className="alert alert-error" role="alert" aria-live="assertive">
+          {error}
+        </div>
       )}
 
-      {/* Limpidez */}
-      <label style={{ display: "grid", gap: 4 }}>
-        <span>Limpidez</span>
-        <div style={{ display: "flex", gap: 16 }}>
+      {result && (
+        <div className="alert alert-success" role="status" aria-live="polite">
+          <div className="alert-title">Enviado com sucesso</div>
+          <div className="alert-body">
+            <div>Score: {result.score}</div>
+            <div className="meta-muted">submitted_at: {result.submitted_at}</div>
+          </div>
+        </div>
+      )}
+
+      <fieldset className="group" disabled={loadingRound || !roundId}>
+        <legend className="group-title">Limpidez</legend>
+        <div className="radio-grid">
           {limpidityOptions.map((opt) => (
-            <label key={opt.value} style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+            <label key={opt.value} className="radio-card">
               <input
                 type="radio"
                 name="limpidity"
                 value={opt.value}
                 checked={limpidity === opt.value}
                 onChange={() => setLimpidity(opt.value)}
-                style={{ accentColor: "#8b0000", width: 18, height: 18 }}
               />
-              <span style={{ fontSize: 12, marginTop: 4 }}>{opt.label}</span>
+              <span className="radio-label">{opt.label}</span>
             </label>
           ))}
         </div>
-      </label>
+      </fieldset>
 
-      {/* Intensidade */}
-      <label style={{ display: "grid", gap: 4 }}>
-        <span>Intensidade</span>
-        <div style={{ display: "flex", gap: 16 }}>
+      <fieldset className="group" disabled={loadingRound || !roundId}>
+        <legend className="group-title">Intensidade</legend>
+        <div className="radio-grid radio-grid--5">
           {intensityOptions.map((opt) => (
-            <label key={opt.value} style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+            <label key={opt.value} className="radio-card">
               <input
                 type="radio"
                 name="intensity"
                 value={opt.value}
                 checked={intensity === opt.value}
                 onChange={() => setIntensity(opt.value)}
-                style={{ accentColor: "#8b0000", width: 18, height: 18 }}
               />
-              <span style={{ fontSize: 12, marginTop: 4 }}>{opt.label}</span>
+              <span className="radio-label">{opt.label}</span>
             </label>
           ))}
         </div>
-      </label>
+      </fieldset>
 
-      {/* Cor */}
-      <label style={{ display: "grid", gap: 4 }}>
-        <span>Cor</span>
-        <div style={{ display: "flex", gap: 16 }}>
+      <fieldset className="group" disabled={loadingRound || !roundId}>
+        <legend className="group-title">Cor</legend>
+        <div className="radio-grid">
           {colorTypeOptions.map((opt) => (
-            <label
-              key={opt.value}
-              style={{ display: "flex", flexDirection: "column", alignItems: "center" }}
-            >
+            <label key={opt.value} className="radio-card">
               <input
                 type="radio"
                 name="colorType"
@@ -218,66 +237,34 @@ export default function SubmitVisual({ participantId, eventId }: SubmitVisualPro
                   setColorType(opt.value);
                   setColorTone(TONES[opt.value][0].value);
                 }}
-                style={{ accentColor: "#8b0000", width: 18, height: 18 }}
               />
-              <span style={{ fontSize: 12, marginTop: 4 }}>{opt.label}</span>
+              <span className="radio-label">{opt.label}</span>
             </label>
           ))}
         </div>
-      </label>
+      </fieldset>
 
-      {/* Tom */}
-      <label style={{ display: "grid", gap: 4 }}>
-        <span>Tom</span>
-        <div style={{ display: "flex", gap: 16 }}>
+      <fieldset className="group" disabled={loadingRound || !roundId}>
+        <legend className="group-title">Tom</legend>
+        <div className="radio-grid">
           {toneOptions.map((t) => (
-            <label key={t.value} style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+            <label key={t.value} className="radio-card">
               <input
                 type="radio"
                 name="tone"
                 value={t.value}
                 checked={colorTone === t.value}
                 onChange={() => setColorTone(t.value)}
-                style={{ accentColor: "#8b0000", width: 18, height: 18 }}
               />
-              <span style={{ fontSize: 12, marginTop: 4 }}>{t.label}</span>
+              <span className="radio-label">{t.label}</span>
             </label>
           ))}
         </div>
-      </label>
+      </fieldset>
 
-      {/* Botão */}
-      <button
-        type="submit"
-        disabled={loading || loadingRound || !roundId}
-        style={{
-          padding: "10px 16px",
-          backgroundColor: "#8b0000",
-          color: "#fff",
-          border: "none",
-          borderRadius: 6,
-          cursor: "pointer",
-        }}
-      >
+      <button type="submit" className="btn btn-primary submit-visual__submit" disabled={loading || loadingRound || !roundId}>
         {loading ? "Enviando..." : loadingRound ? "Aguardando round..." : !roundId ? "Sem round" : "Enviar avaliação"}
       </button>
-
-      {/* Feedback */}
-      {error && <p style={{ color: "#f66" }}>{error}</p>}
-      {result && (
-        <div
-          style={{
-            marginTop: 16,
-            padding: 12,
-            backgroundColor: "#eef",
-            borderRadius: 6,
-          }}
-        >
-          <strong>Enviado com sucesso ✅</strong>
-          <div>Score: {result.score}</div>
-          <div style={{ fontSize: 12, opacity: 0.7 }}>submitted_at: {result.submitted_at}</div>
-        </div>
-      )}
     </form>
   );
 }
