@@ -17,6 +17,7 @@ export default function App() {
   const [gabaritoEvents, setGabaritoEvents] = useState<Array<{ id: string; name: string; access_code: string; is_open: boolean }>>([]);
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
 
+  
   useEffect(() => {
     async function fetchOpenEvents() {
       if (sommelierView !== 'gabarito') return;
