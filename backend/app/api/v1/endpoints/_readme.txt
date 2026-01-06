@@ -1,0 +1,1 @@
+api/endpoints → HTTP puro

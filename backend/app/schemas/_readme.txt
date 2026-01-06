@@ -1,0 +1,1 @@
+schemas → validação / contrato API

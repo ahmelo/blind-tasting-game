@@ -1,0 +1,22 @@
+/* styles/theme.css */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  height: 100%;
+  font-family: serif;
+}
+
+:root {
+  --wine-dark: #5a0f0f;
+  --wine-main: #7a1a1a;
+  --wine-light: #a63a3a;
+  --text-light: #ffffff;
+}
