@@ -52,14 +52,21 @@ export default function Events({ onBack }: { onBack: () => void }) {
   async function toggleOpen(id: string, current: boolean) {
     setError("");
     try {
-      await apiPatch<{ name?: string; access_code?: string }, { id: string; is_open: boolean }>(`/events/${id}/open`, { name: "", access_code: "" });
+      await apiPatch<{ name?: string; access_code?: string }, { id: string; is_open: boolean }>(
+        `/events/${id}/open`,
+        { name: "", access_code: "" }
+      );
       // server implementation uses separate /events/{id}/open with boolean param; since our backend requires boolean 'open' param in query or body, we'll call patch /events/{id} to update is_open via name placeholder
       // For now, call the dedicated endpoint using fetch-like approach: call apiPatch with body { } and update locally
       // Simpler approach: hit /events/{id} with same name and toggle is_open
-      const res = await fetch(`${import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api/v1"}/events/${id}/open?open=${!current}`, { method: "PATCH" });
+      const res = await fetch(
+        `${import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api/v1"}/events/${id}/open?open=${!current}`,
+        { method: "PATCH" }
+      );
       if (!res.ok) throw new Error(await res.text());
       const body = await res.json();
-      setEvents((s) => s.map((it) => (it.id === id ? { ...it, is_open: body.is_open } : it)));    } catch (err: any) {
+      setEvents((s) => s.map((it) => (it.id === id ? { ...it, is_open: body.is_open } : it)));
+    } catch (err: any) {
       setError(err?.message ?? "Erro ao atualizar evento");
     }
   }
@@ -76,51 +83,95 @@ export default function Events({ onBack }: { onBack: () => void }) {
   }
 
   return (
-    <div style={{ maxWidth: 800 }}>
-      <button onClick={onBack} style={{ marginBottom: 12 }}>
-        ← Voltar
-      </button>
+    <div className="events-page card stack">
+      <div className="card-header row-between">
+        <div>
+          <h2 className="h2">Eventos</h2>
+        </div>
 
-      <h2>Eventos</h2>
+        <button type="button" className="btn btn-ghost" onClick={onBack}>
+          Voltar
+        </button>
+      </div>
 
-      <form onSubmit={createEvent} style={{ display: "flex", gap: 8, marginBottom: 12 }}>
-        <input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="Nome do evento" required />
-        <input value={newCode} onChange={(e) => setNewCode(e.target.value)} placeholder="Código de acesso (opcional)" />
-        <button type="submit">Criar</button>
+      <form className="events-form" onSubmit={createEvent}>
+        <div className="field">
+          <label className="label" htmlFor="eventName">
+            Nome do evento
+          </label>
+          <input
+            id="eventName"
+            className="input"
+            value={newName}
+            onChange={(e) => setNewName(e.target.value)}
+            placeholder="Ex.: Degustação Blind #1"
+            required
+          />
+        </div>
+
+        <div className="field">
+          <label className="label" htmlFor="eventCode">
+            Código de acesso (opcional)
+          </label>
+          <input
+            id="eventCode"
+            className="input"
+            value={newCode}
+            onChange={(e) => setNewCode(e.target.value)}
+            placeholder="Ex.: SV2026"
+          />
+        </div>
+
+        <div className="events-form-actions">
+          <button type="submit" className="btn btn-primary">
+            Criar
+          </button>
+
+          <button type="button" className="btn btn-outline" onClick={fetchEvents}>
+            Atualizar
+          </button>
+        </div>
       </form>
 
-      {loading && <p>Carregando eventos...</p>}
-      {error && <p style={{ color: "#f66" }}>{error}</p>}
+      {loading && (
+        <div className="alert" role="status" aria-live="polite">
+          Carregando eventos...
+        </div>
+      )}
 
-      {!loading && events.length === 0 && <p>Nenhum evento cadastrado.</p>}
+      {error && (
+        <div className="alert alert-error" role="alert" aria-live="assertive">
+          {error}
+        </div>
+      )}
 
-      <table style={{ width: "100%", borderCollapse: "collapse" }}>
-        <thead>
-          <tr>
-            <th style={{ borderBottom: "1px solid #ccc", padding: 6 }}>Nome</th>
-            <th style={{ borderBottom: "1px solid #ccc", padding: 6 }}>Código</th>
-            <th style={{ borderBottom: "1px solid #ccc", padding: 6 }}>Aberto</th>
-            <th style={{ borderBottom: "1px solid #ccc", padding: 6 }}>Ações</th>
-          </tr>
-        </thead>
-        <tbody>
-          {events.map((ev) => (
-            <tr key={ev.id}>
-              <td style={{ padding: 6 }}>{ev.name}</td>
-              <td style={{ padding: 6 }}>{ev.access_code ?? "—"}</td>
-              <td style={{ padding: 6 }}>{ev.is_open ? "Sim" : "Não"}</td>
-              <td style={{ padding: 6 }}>
-                <button onClick={() => toggleOpen(ev.id, ev.is_open)} style={{ marginRight: 8 }}>
-                  {ev.is_open ? "Fechar" : "Abrir"}
-                </button>
-                <button onClick={() => remove(ev.id)} style={{ color: "#900" }}>
-                  Excluir
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      {!loading && events.length === 0 && <p className="muted">Nenhum evento cadastrado.</p>}
+
+      <div className="event-list">
+        {events.map((ev) => (
+          <div key={ev.id} className="event-row">
+            <div className="event-row-main">
+              <div className="event-row-title">{ev.name}</div>
+              <div className="event-row-meta">
+                <span className="event-row-code">Código: {ev.access_code ?? "—"}</span>
+                <span className={ev.is_open ? "event-badge event-badge--open" : "event-badge event-badge--closed"}>
+                  {ev.is_open ? "Aberto" : "Fechado"}
+                </span>
+              </div>
+            </div>
+
+            <div className="event-row-actions">
+              <button type="button" className="btn btn-outline" onClick={() => toggleOpen(ev.id, ev.is_open)}>
+                {ev.is_open ? "Fechar" : "Abrir"}
+              </button>
+
+              <button type="button" className="btn btn-ghost btn-danger" onClick={() => remove(ev.id)}>
+                Excluir
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

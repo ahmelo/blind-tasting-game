@@ -61,27 +61,40 @@ export default function App() {
           <div className="container">
             {sommelierView === "menu" ? (
               <div className="card stack">
-                <div className="card-header">
-                  <h1 className="h1">Menu</h1>
-                  <p className="muted">Escolha uma ação para gerenciar ou participar com gabarito.</p>
-                </div>
+                <div className="menu-list">
+                <button type="button" className="menu-item" onClick={() => setSommelierView("events")}>
+                  <span className="menu-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><path d="M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3h1V3a1 1 0 0 1 1-1Zm13 8H4v9a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-9Z"/></svg>
+                  </span>
+                  <span className="menu-text">
+                    <span className="menu-title">Evento</span>
+                    <span className="menu-desc">Criar, editar e abrir/fechar eventos</span>
+                  </span>
+                  <span className="menu-chevron" aria-hidden="true">›</span>
+                </button>
 
-                <div className="menu-grid">
-                  <button className="menu-card" onClick={() => setSommelierView("events")}>
-                    <div className="menu-card-title">CRUD Evento</div>
-                    <div className="menu-card-subtitle">Criar, editar e abrir/fechar eventos</div>
-                  </button>
+                <button type="button" className="menu-item" onClick={() => setSommelierView("rounds")}>
+                  <span className="menu-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><path d="M4 6a3 3 0 0 1 3-3h3a3 3 0 0 1 3 3v3a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V6Zm11 9a3 3 0 0 1 3-3h1a3 3 0 0 1 3 3v1a3 3 0 0 1-3 3h-1a3 3 0 0 1-3-3v-1ZM4 15a3 3 0 0 1 3-3h1a3 3 0 0 1 3 3v1a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3v-1Zm11-9a3 3 0 0 1 3-3h1a3 3 0 0 1 3 3v1a3 3 0 0 1-3 3h-1a3 3 0 0 1-3-3V6Z"/></svg>
+                  </span>
+                  <span className="menu-text">
+                    <span className="menu-title">Round</span>
+                    <span className="menu-desc">Gerenciar rounds e seus parâmetros</span>
+                  </span>
+                  <span className="menu-chevron" aria-hidden="true">›</span>
+                </button>
 
-                  <button className="menu-card" onClick={() => setSommelierView("rounds")}>
-                    <div className="menu-card-title">CRUD Round</div>
-                    <div className="menu-card-subtitle">Gerenciar rounds e seus parâmetros</div>
-                  </button>
-
-                  <button className="menu-card" onClick={() => setSommelierView("gabarito")}>
-                    <div className="menu-card-title">Gabarito</div>
-                    <div className="menu-card-subtitle">Participar de evento como resposta oficial</div>
-                  </button>
-                </div>
+                <button type="button" className="menu-item" onClick={() => setSommelierView("gabarito")}>
+                  <span className="menu-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><path d="M9 11a1 1 0 0 1 1.707-.707l1.293 1.293 3.293-3.293A1 1 0 1 1 16.707 9l-4 4A1 1 0 0 1 11.293 13l-2-2A1 1 0 0 1 9 11Zm3-9a9 9 0 1 1 0 18A9 9 0 0 1 12 2Z"/></svg>
+                  </span>
+                  <span className="menu-text">
+                    <span className="menu-title">Gabarito</span>
+                    <span className="menu-desc">Participar de evento como resposta oficial</span>
+                  </span>
+                  <span className="menu-chevron" aria-hidden="true">›</span>
+                </button>
+              </div>
               </div>
             ) : sommelierView === "events" ? (
               <div className="stack">
@@ -106,7 +119,6 @@ export default function App() {
                 <div className="card-header row-between">
                   <div>
                     <h1 className="h1">Gabarito</h1>
-                    <p className="muted">Selecione um evento aberto para enviar o gabarito.</p>
                   </div>
 
                   <button className="btn btn-ghost" onClick={() => setSommelierView("menu")}>
@@ -121,26 +133,47 @@ export default function App() {
                   </div>
                 ) : (
                   <div className="stack">
-                    <div className="field">
-                      <label className="label" htmlFor="eventSelect">
-                        Evento
-                      </label>
-                      <select
-                        id="eventSelect"
-                        className="select"
-                        value={selectedEventId ?? ""}
-                        onChange={(e) => setSelectedEventId(e.target.value)}
-                      >
-                        <option value="">-- selecione --</option>
-                        {gabaritoEvents.map((ev) => (
-                          <option key={ev.id} value={ev.id}>
-                            {`${ev.name} (${ev.access_code})`}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+                  {!selectedEventId ? (
+                    <div className="menu-list">
+                      {gabaritoEvents.map((ev) => (
+                        <button
+                          key={ev.id}
+                          type="button"
+                          className="menu-item"
+                          onClick={() => setSelectedEventId(ev.id)}
+                        >
+                          <span className="menu-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24">
+                              <path d="M12 2a4 4 0 0 1 4 4v2h1a3 3 0 0 1 3 3v7a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4v-7a3 3 0 0 1 3-3h1V6a4 4 0 0 1 4-4Zm2 6V6a2 2 0 1 0-4 0v2h4Z" />
+                            </svg>
+                          </span>
 
-                    {selectedEventId && (
+                          <span className="menu-text">
+                            <span className="menu-title">{ev.name}</span>
+                            <span className="menu-desc">Código: {ev.access_code}</span>
+                          </span>
+
+                          <span className="menu-chevron" aria-hidden="true">
+                            ›
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="stack">
+                      <div className="row-between">
+                        <div className="menu-selected">
+                          <div className="menu-selected__title">Evento selecionado</div>
+                          <div className="menu-selected__subtitle">
+                            {gabaritoEvents.find((e) => e.id === selectedEventId)?.name ?? "Evento"}
+                          </div>
+                        </div>
+
+                        <button type="button" className="btn btn-ghost" onClick={() => setSelectedEventId(null)}>
+                          Trocar
+                        </button>
+                      </div>
+
                       <div className="card card-inset stack">
                         <h2 className="h2">Enviar gabarito</h2>
                         <SubmitVisual
@@ -150,8 +183,9 @@ export default function App() {
                           lockAnswerKey={true}
                         />
                       </div>
-                    )}
-                  </div>
+                    </div>
+                  )}
+                </div>
                 )}
               </div>
             )}
@@ -169,7 +203,7 @@ export default function App() {
             <div className="brand-dot" aria-hidden="true" />
             <div className="topbar-titles">
               <div className="topbar-title">Degustação às Cegas</div>
-              <div className="topbar-subtitle">Bem-vindo, {user.info.name}</div>
+              <div className="topbar-subtitle">Bem-vindo(a), {user.info.name}</div>
             </div>
           </div>
 
@@ -185,9 +219,7 @@ export default function App() {
             <div className="card stack">
               <div className="card-header">
                 <h1 className="h1">Avaliação Visual</h1>
-                <p className="muted">Preencha sua avaliação. Seus destaques e ações seguem o padrão do sistema.</p>
               </div>
-
               <SubmitVisual participantId={user.info.participant_id} eventId={user.info.event_id} />
             </div>
 

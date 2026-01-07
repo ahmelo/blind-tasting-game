@@ -132,20 +132,6 @@ export default function SubmitVisual({ participantId, eventId }: SubmitVisualPro
   return (
     <form onSubmit={onSubmit} className="submit-visual">
       <header className="submit-visual__header">
-        <div className="submit-visual__header-top">
-          <div>
-            <h2 className="submit-visual__title">Avaliação Visual</h2>
-            <p className="submit-visual__subtitle">Selecione as opções e envie sua avaliação.</p>
-          </div>
-
-          {loadingRound ? (
-            <span className="pill pill-neutral">Carregando</span>
-          ) : roundId ? (
-            <span className="pill pill-success">Round aberto</span>
-          ) : (
-            <span className="pill pill-danger">Sem round</span>
-          )}
-        </div>
 
         {loadingRound ? (
           <div className="submit-visual__meta">
@@ -155,13 +141,7 @@ export default function SubmitVisual({ participantId, eventId }: SubmitVisualPro
         ) : roundId ? (
           <div className="submit-visual__meta">
             <div>
-              <span className="meta-label">Round:</span>{" "}
               <strong className="meta-value">{roundName}</strong>{" "}
-              <span className="meta-muted">({roundId})</span>
-            </div>
-            <div>
-              <span className="meta-label">Participante:</span>{" "}
-              <strong className="meta-value">{participantIdState}</strong>
             </div>
           </div>
         ) : (
@@ -207,7 +187,7 @@ export default function SubmitVisual({ participantId, eventId }: SubmitVisualPro
 
       <fieldset className="group" disabled={loadingRound || !roundId}>
         <legend className="group-title">Intensidade</legend>
-        <div className="radio-grid radio-grid--5">
+        <div className="radio-grid-list radio-grid--5">
           {intensityOptions.map((opt) => (
             <label key={opt.value} className="radio-card">
               <input
@@ -225,7 +205,7 @@ export default function SubmitVisual({ participantId, eventId }: SubmitVisualPro
 
       <fieldset className="group" disabled={loadingRound || !roundId}>
         <legend className="group-title">Cor</legend>
-        <div className="radio-grid">
+        <div className="radio-grid-list">
           {colorTypeOptions.map((opt) => (
             <label key={opt.value} className="radio-card">
               <input
@@ -246,7 +226,7 @@ export default function SubmitVisual({ participantId, eventId }: SubmitVisualPro
 
       <fieldset className="group" disabled={loadingRound || !roundId}>
         <legend className="group-title">Tom</legend>
-        <div className="radio-grid">
+        <div className="radio-grid-list">
           {toneOptions.map((t) => (
             <label key={t.value} className="radio-card">
               <input

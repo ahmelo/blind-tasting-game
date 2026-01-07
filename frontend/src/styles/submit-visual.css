@@ -91,28 +91,28 @@
 .radio-grid{
   margin-top:10px;
   display:grid;
-  grid-template-columns: repeat(2, minmax(0,1fr));
+  grid-template-columns: 1fr;
   gap:10px;
 }
 @media (min-width:720px){
   .radio-grid{grid-template-columns: repeat(4, minmax(0,1fr));}
 }
 .radio-grid--5{
-  grid-template-columns: repeat(2, minmax(0,1fr));
+  grid-template-columns: 1fr;
 }
 @media (min-width:720px){
-  .radio-grid--5{grid-template-columns: repeat(5, minmax(0,1fr));}
+  .radio-grid--5{grid-template-columns: 1fr;}
 }
 
 .radio-card{
   display:flex;
-  flex-direction:column;
+  flex-direction:row;
   align-items:center;
-  gap:8px;
+  gap:12px;
   padding:10px;
   border-radius: 14px;
-  border: 1px solid rgba(17,24,39,.10);
-  background:#fff;
+  border: none;
+  background:#f6f7f8;
   cursor:pointer;
   user-select:none;
   transition: transform .06s ease, box-shadow .15s ease, border-color .15s ease;
@@ -136,7 +136,7 @@
   font-size: 12px;
   font-weight: 700;
   color: var(--sv-text);
-  text-align:center;
+  text-align:left;
 }
 
 .submit-visual__submit{

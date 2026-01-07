@@ -15,7 +15,9 @@ export default function Rounds({ onBack }: { onBack: () => void }) {
   const [newPosition, setNewPosition] = useState<number | undefined>(undefined);
 
   const [editing, setEditing] = useState<{ [id: string]: boolean }>({});
-  const [editValues, setEditValues] = useState<{ [id: string]: { name?: string; position?: number; is_open?: boolean } }>({});
+  const [editValues, setEditValues] = useState<{ [id: string]: { name?: string; position?: number; is_open?: boolean } }>(
+    {}
+  );
 
   async function fetchEvents() {
     try {
@@ -110,91 +112,212 @@ export default function Rounds({ onBack }: { onBack: () => void }) {
     }
   }
 
+  const selectedEventLabel =
+    events.find((ev) => ev.id === selectedEvent)?.name ??
+    (selectedEvent ? "Evento selecionado" : "Selecione um evento aberto");
+
   return (
-    <div style={{ maxWidth: 800 }}>
-      <button onClick={onBack} style={{ marginBottom: 12 }}>
-        ← Voltar
-      </button>
+    <div className="rounds-page card stack">
+      <div className="card-header row-between">
+        <div>
+          <h2 className="h2">Rounds</h2>
+          <p className="muted">Selecione um evento aberto e gerencie seus rounds.</p>
+        </div>
 
-      <h2>Rounds</h2>
-
-      <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
-        <select value={selectedEvent ?? ""} onChange={(e) => setSelectedEvent(e.target.value || null)}>
-          <option value="">Selecione um evento aberto</option>
-          {events.map((ev) => (
-            <option key={ev.id} value={ev.id}>
-              {ev.name} ({ev.access_code ?? "—"})
-            </option>
-          ))}
-        </select>
+        <button type="button" className="btn btn-ghost" onClick={onBack}>
+          Voltar
+        </button>
       </div>
 
-      {selectedEvent && (
-        <form onSubmit={createRound} style={{ display: "flex", gap: 8, marginBottom: 12 }}>
-          <input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="Nome do round" required />
-          <input type="number" value={newPosition ?? ""} onChange={(e) => setNewPosition(e.target.value ? Number(e.target.value) : undefined)} placeholder="Posição (opcional)" />
-          <button type="submit">Criar</button>
-        </form>
+      {/* Seleção de evento (clean) */}
+      {!selectedEvent ? (
+        <div className="stack">
+          <div className="field">
+            <label className="label" htmlFor="roundsEventSelect">
+              Evento aberto
+            </label>
+            <select
+              id="roundsEventSelect"
+              className="select select--clean"
+              value={selectedEvent ?? ""}
+              onChange={(e) => setSelectedEvent(e.target.value || null)}
+            >
+              <option value="">Selecione um evento aberto</option>
+              {events.map((ev) => (
+                <option key={ev.id} value={ev.id}>
+                  {ev.name} ({ev.access_code ?? "—"})
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <p className="muted">Selecione um evento para ver e criar rounds.</p>
+        </div>
+      ) : (
+        <div className="stack">
+          <div className="row-between">
+            <div className="menu-selected">
+              <div className="menu-selected__title">Evento selecionado</div>
+              <div className="menu-selected__subtitle">{selectedEventLabel}</div>
+            </div>
+
+            <div className="rounds-actions-top">
+              <button type="button" className="btn btn-outline" onClick={() => fetchRounds(selectedEvent)}>
+                Atualizar
+              </button>
+
+              <button type="button" className="btn btn-ghost" onClick={() => setSelectedEvent(null)}>
+                Trocar
+              </button>
+            </div>
+          </div>
+
+          {/* Criar round */}
+          <form className="rounds-form" onSubmit={createRound}>
+            <div className="field">
+              <label className="label" htmlFor="roundName">
+                Nome do round
+              </label>
+              <input
+                id="roundName"
+                className="input"
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+                placeholder="Ex.: Round 1"
+                required
+              />
+            </div>
+
+            <div className="field">
+              <label className="label" htmlFor="roundPos">
+                Posição (opcional)
+              </label>
+              <input
+                id="roundPos"
+                className="input"
+                type="number"
+                value={newPosition ?? ""}
+                onChange={(e) => setNewPosition(e.target.value ? Number(e.target.value) : undefined)}
+                placeholder="Ex.: 1"
+              />
+            </div>
+
+            <div className="rounds-form-actions">
+              <button type="submit" className="btn btn-primary">
+                Criar
+              </button>
+            </div>
+          </form>
+        </div>
       )}
 
-      {loading && <p>Carregando rounds...</p>}
-      {error && <p style={{ color: "#f66" }}>{error}</p>}
+      {loading && (
+        <div className="alert" role="status" aria-live="polite">
+          Carregando rounds...
+        </div>
+      )}
 
-      {!selectedEvent && <p>Selecione um evento para ver seus rounds.</p>}
+      {error && (
+        <div className="alert alert-error" role="alert" aria-live="assertive">
+          {error}
+        </div>
+      )}
 
-      {selectedEvent && rounds.length === 0 && <p>Nenhum round cadastrado para este evento.</p>}
+      {selectedEvent && !loading && rounds.length === 0 && <p className="muted">Nenhum round cadastrado para este evento.</p>}
 
-      {rounds.length > 0 && (
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
-          <thead>
-            <tr>
-              <th style={{ borderBottom: "1px solid #ccc", padding: 6 }}>Posição</th>
-              <th style={{ borderBottom: "1px solid #ccc", padding: 6 }}>Nome</th>
-              <th style={{ borderBottom: "1px solid #ccc", padding: 6 }}>Aberto</th>
-              <th style={{ borderBottom: "1px solid #ccc", padding: 6 }}>Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rounds.map((r) => (
-              <tr key={r.id}>
-                <td style={{ padding: 6 }}>{r.position}</td>
-                <td style={{ padding: 6 }}>
-                  {editing[r.id] ? (
-                    <input value={editValues[r.id]?.name ?? ""} onChange={(e) => setEditValues((s) => ({ ...s, [r.id]: { ...(s[r.id] ?? {}), name: e.target.value } }))} />
+      {/* Lista (no lugar da tabela) */}
+      {selectedEvent && rounds.length > 0 && (
+        <div className="round-list">
+          {rounds.map((r) => {
+            const isEditing = !!editing[r.id];
+            const vals = editValues[r.id] ?? {};
+
+            return (
+              <div key={r.id} className="round-row">
+                <div className="round-row-main">
+                  <div className="round-row-top">
+                    <span className="round-badge">Posição {r.position}</span>
+                    <span className={r.is_open ? "event-badge event-badge--open" : "event-badge event-badge--closed"}>
+                      {r.is_open ? "Aberto" : "Fechado"}
+                    </span>
+                  </div>
+
+                  {!isEditing ? (
+                    <div className="round-row-title">{r.name}</div>
                   ) : (
-                    r.name
+                    <div className="round-edit-grid">
+                      <div className="field">
+                        <label className="label" htmlFor={`editName-${r.id}`}>
+                          Nome
+                        </label>
+                        <input
+                          id={`editName-${r.id}`}
+                          className="input"
+                          value={vals.name ?? ""}
+                          onChange={(e) =>
+                            setEditValues((s) => ({ ...s, [r.id]: { ...(s[r.id] ?? {}), name: e.target.value } }))
+                          }
+                        />
+                      </div>
+
+                      <div className="field">
+                        <label className="label" htmlFor={`editPos-${r.id}`}>
+                          Posição
+                        </label>
+                        <input
+                          id={`editPos-${r.id}`}
+                          className="input"
+                          type="number"
+                          value={vals.position ?? ""}
+                          onChange={(e) =>
+                            setEditValues((s) => ({
+                              ...s,
+                              [r.id]: { ...(s[r.id] ?? {}), position: e.target.value ? Number(e.target.value) : undefined },
+                            }))
+                          }
+                        />
+                      </div>
+
+                      <label className="checkline" htmlFor={`editOpen-${r.id}`}>
+                        <input
+                          id={`editOpen-${r.id}`}
+                          type="checkbox"
+                          checked={vals.is_open ?? false}
+                          onChange={(e) =>
+                            setEditValues((s) => ({ ...s, [r.id]: { ...(s[r.id] ?? {}), is_open: e.target.checked } }))
+                          }
+                        />
+                        <span>Aberto</span>
+                      </label>
+                    </div>
                   )}
-                </td>
-                <td style={{ padding: 6 }}>
-                  {editing[r.id] ? (
-                    <input type="checkbox" checked={editValues[r.id]?.is_open ?? false} onChange={(e) => setEditValues((s) => ({ ...s, [r.id]: { ...(s[r.id] ?? {}), is_open: e.target.checked } }))} />
-                  ) : (
-                    r.is_open ? "Sim" : "Não"
-                  )}
-                </td>
-                <td style={{ padding: 6 }}>
-                  {editing[r.id] ? (
+                </div>
+
+                <div className="round-row-actions">
+                  {isEditing ? (
                     <>
-                      <button onClick={() => saveEdit(r.id)} style={{ marginRight: 8 }}>
+                      <button type="button" className="btn btn-primary" onClick={() => saveEdit(r.id)}>
                         Salvar
                       </button>
-                      <button onClick={() => cancelEdit(r.id)}>Cancelar</button>
+                      <button type="button" className="btn btn-ghost" onClick={() => cancelEdit(r.id)}>
+                        Cancelar
+                      </button>
                     </>
                   ) : (
                     <>
-                      <button onClick={() => startEdit(r.id)} style={{ marginRight: 8 }}>
+                      <button type="button" className="btn btn-outline" onClick={() => startEdit(r.id)}>
                         Editar
                       </button>
-                      <button onClick={() => remove(r.id)} style={{ color: "#900" }}>
+                      <button type="button" className="btn btn-ghost btn-danger" onClick={() => remove(r.id)}>
                         Excluir
                       </button>
                     </>
                   )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       )}
     </div>
   );
