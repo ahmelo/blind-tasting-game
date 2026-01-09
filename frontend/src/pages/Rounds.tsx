@@ -124,9 +124,6 @@ export default function Rounds({ onBack }: { onBack: () => void }) {
           <p className="muted">Selecione um evento aberto e gerencie seus rounds.</p>
         </div>
 
-        <button type="button" className="btn btn-ghost" onClick={onBack}>
-          Voltar
-        </button>
       </div>
 
       {/* Seleção de evento (clean) */}
@@ -151,7 +148,6 @@ export default function Rounds({ onBack }: { onBack: () => void }) {
             </select>
           </div>
 
-          <p className="muted">Selecione um evento para ver e criar rounds.</p>
         </div>
       ) : (
         <div className="stack">
@@ -319,6 +315,9 @@ export default function Rounds({ onBack }: { onBack: () => void }) {
           })}
         </div>
       )}
+      <button type="button" className="btn btn-ghost" onClick={onBack}>
+          Voltar
+        </button>
     </div>
   );
 }

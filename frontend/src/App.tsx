@@ -180,7 +180,6 @@ export default function App() {
                           participantId={user.info.participant_id}
                           eventId={selectedEventId}
                           initialIsAnswerKey={true}
-                          lockAnswerKey={true}
                         />
                       </div>
                     </div>
@@ -220,7 +219,7 @@ export default function App() {
               <div className="card-header">
                 <h1 className="h1">Avaliação Visual</h1>
               </div>
-              <SubmitVisual participantId={user.info.participant_id} eventId={user.info.event_id} />
+              <SubmitVisual participantId={user.info.participant_id} eventId={user.info.event_id} initialIsAnswerKey={false} />
             </div>
 
             <div className="card stack">

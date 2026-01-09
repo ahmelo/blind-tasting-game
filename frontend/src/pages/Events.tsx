@@ -88,10 +88,6 @@ export default function Events({ onBack }: { onBack: () => void }) {
         <div>
           <h2 className="h2">Eventos</h2>
         </div>
-
-        <button type="button" className="btn btn-ghost" onClick={onBack}>
-          Voltar
-        </button>
       </div>
 
       <form className="events-form" onSubmit={createEvent}>
@@ -172,6 +168,9 @@ export default function Events({ onBack }: { onBack: () => void }) {
           </div>
         ))}
       </div>
+        <button type="button" className="btn btn-ghost" onClick={onBack}>
+          Voltar
+        </button>
     </div>
   );
 }
