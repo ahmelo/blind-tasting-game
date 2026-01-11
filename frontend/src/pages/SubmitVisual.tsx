@@ -8,6 +8,7 @@ import type {
 } from "../types/visual";
 import "../styles/submit-visual.css";
 
+
 type RoundApiItem = {
   id: string;
   name: string;
@@ -60,14 +61,16 @@ interface SubmitVisualProps {
   participantId: string;
   eventId: string;
   initialIsAnswerKey: boolean;
+  onEventClosed: () => void;
 }
 
-export default function SubmitVisual({ participantId, eventId, initialIsAnswerKey}: SubmitVisualProps) {
+export default function SubmitVisual({ participantId, eventId, initialIsAnswerKey, onEventClosed }: SubmitVisualProps) {
 
   const [isAnswerKey, setIsAnswerKey] = useState<boolean>(initialIsAnswerKey);
 
   const [canCloseRound, setCanCloseRound] = useState(false);
   const [closingRound, setClosingRound] = useState(false);
+  const [closingEvent, setClosingEvent] = useState(false);
 
   const [roundId, setRoundId] = useState<string | null>(null);
   const [roundName, setRoundName] = useState<string | null>(null);
@@ -108,6 +111,25 @@ export default function SubmitVisual({ participantId, eventId, initialIsAnswerKe
     setIsAnswerKey(initialIsAnswerKey);
   }, [roundId]);
 
+  useEffect(() => {
+    if (!waiting || !onEventClosed) return;
+
+    const interval = setInterval(async () => {
+      try {
+        const events = await apiGet<any[]>("/events");
+        const event = events.find(e => e.id === eventId);
+
+        if (event && event.is_open === false) {
+          clearInterval(interval);
+          onEventClosed();
+        }
+      } catch {
+        // ignora erro momentâneo
+      }
+    }, 3000); // 3 segundos (ótimo equilíbrio)
+
+    return () => clearInterval(interval);
+  }, [waiting, eventId, onEventClosed]);
 
   async function loadPendingRound() {
     setLoadingRound(true);
@@ -163,6 +185,22 @@ export default function SubmitVisual({ participantId, eventId, initialIsAnswerKe
     }
   }
 
+  async function closeEvent() {
+    if (!eventId) return;
+
+    setClosingEvent(true);
+    setError("");
+
+    try {
+      await apiPost(`/events/${eventId}/close`, {});
+      setWaiting(true); // evento acabou, não tem mais fluxo
+    } catch {
+      setError("Erro ao fechar o evento.");
+    } finally {
+      setClosingEvent(false);
+    }
+  }
+
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
@@ -211,24 +249,41 @@ export default function SubmitVisual({ participantId, eventId, initialIsAnswerKe
   }
 
   if (waiting) {
+    // SOMMELIER
+    if (isAnswerKey) {
+      return (
+        <div className="alert">
+          <p>Todos os rounds foram finalizados.</p>
+
+          <div style={{ marginTop: 16 }}>
+            <button
+              type="button"
+              className="btn btn-danger"
+              disabled={closingEvent}
+              onClick={closeEvent}
+            >
+              {closingEvent ? "Fechando evento..." : "Fechar evento"}
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    // PARTICIPANTE
     return (
       <div className="alert">
-        Nenhum round disponível no momento. Aguarde.
-        <div style={{ marginTop: 12 }}>
-          <button className="btn btn-outline" onClick={loadPendingRound}>
-            Verificar novamente
-          </button>
-        </div>
+        Nenhum round disponível no momento.
+        <p>Aguarde o sommelier finalizar a próxima rodada.</p>
       </div>
     );
   }
+
 
   return (
     <form onSubmit={onSubmit} className="submit-visual">
       <h3>{roundName}</h3>
 
       {error && <div className="alert alert-error">{error}</div>}
-      {result && <div className="alert alert-success">Enviado com sucesso</div>}
 
       {/* Limpidez */}
       <fieldset className="group" disabled={loadingRound || !roundId || canCloseRound}>

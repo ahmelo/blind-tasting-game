@@ -65,7 +65,9 @@ def init_mvp():
             id=str(uuid.uuid4()),
             name=EVENT_NAME,
             is_open=True,
+            access_code=1,
             created_at=datetime.utcnow()
+            
         )
         db.add(event)
         db.commit()

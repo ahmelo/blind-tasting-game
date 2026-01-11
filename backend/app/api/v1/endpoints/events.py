@@ -127,3 +127,11 @@ def get_open_round(
         raise HTTPException(status_code=404, detail="No open round for this event")
 
     return OpenRoundResponse(id=round_obj.id, name=round_obj.name, position=round_obj.position)
+
+@router.post("/events/{event_id}/close")
+def close_event(event_id: str, db: Session = Depends(get_db)):
+    try:
+        EventService.close_event(db, event_id)
+        return {"message": "Evento fechado com sucesso."}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))

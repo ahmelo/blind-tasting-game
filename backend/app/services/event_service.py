@@ -5,6 +5,7 @@ from sqlalchemy import desc
 from app.models.round import Round
 from app.models.participant import Participant
 from uuid import UUID
+from app.models.event import Event
 
 class EventService:
 
@@ -49,3 +50,32 @@ class EventService:
             return None
 
         return ranking[0]
+    
+    @staticmethod
+    def close_event(db: Session, event_id: str):
+        event = db.query(Event).filter(Event.id == event_id).first()
+
+        if not event:
+            raise ValueError("Evento não encontrado.")
+
+        if not event.is_open:
+            raise ValueError("Evento já está fechado.")
+
+        open_rounds = (
+            db.query(Round)
+            .filter(
+                Round.event_id == event_id,
+                Round.is_open.is_(True)
+            )
+            .count()
+        )
+
+        if open_rounds > 0:
+            raise ValueError(
+                "Não é possível fechar o evento com rounds abertos."
+            )
+
+        event.is_open = False
+        db.commit()
+
+        return event
