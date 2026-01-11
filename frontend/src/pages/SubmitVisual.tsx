@@ -107,6 +107,7 @@ export default function SubmitVisual({ participantId, eventId, initialIsAnswerKe
     if (roundId) {
       resetForm();
       setCanCloseRound(false);
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
     setIsAnswerKey(initialIsAnswerKey);
   }, [roundId]);
@@ -177,7 +178,7 @@ export default function SubmitVisual({ participantId, eventId, initialIsAnswerKe
       await apiPost(`/rounds/${roundId}/close`, {});
       setCanCloseRound(false);
       await loadPendingRound(); // vai buscar o próximo round aberto
-      window.scrollTo({ top: 0, behavior: "smooth" });
+ //     window.scrollTo({ top: 0, behavior: "smooth" });
     } catch {
       setError("Erro ao fechar a rodada.");
     } finally {
@@ -238,7 +239,7 @@ export default function SubmitVisual({ participantId, eventId, initialIsAnswerKe
       } else{
         await new Promise((r) => setTimeout(r, 800));
         await loadPendingRound();
-        window.scrollTo({ top: 0, behavior: "smooth" });
+  //      window.scrollTo({ top: 0, behavior: "smooth" });
       }
 
     } catch {

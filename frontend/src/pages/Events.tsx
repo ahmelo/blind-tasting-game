@@ -69,9 +69,13 @@ export default function Events({
       <h2 className="h2">Eventos</h2>
 
       <form onSubmit={createEvent} className="stack">
-        <input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="Nome" />
-        <input value={newCode} onChange={(e) => setNewCode(e.target.value)} placeholder="Código" />
+        <input value={newName} onChange={(e) => setNewName(e.target.value)} className="input" placeholder="Nome" />
+        <input value={newCode} onChange={(e) => setNewCode(e.target.value)} className="input" placeholder="Código" />
         <button className="btn btn-primary">Criar</button>
+
+        <label className="label" htmlFor="eventCode">
+          Código do Evento
+        </label>
       </form>
 
       {loading && <p>Carregando…</p>}

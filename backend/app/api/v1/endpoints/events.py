@@ -8,6 +8,8 @@ from app.models.event import Event
 from pydantic import BaseModel
 from typing import List, Optional
 from uuid import UUID
+from app.models.round import Round
+from pydantic import BaseModel
 
 router = APIRouter()
 
@@ -106,8 +108,7 @@ def delete_event(event_id: UUID, db: Session = Depends(get_db)):
     db.delete(event)
     db.commit()
     return None
-from app.models.round import Round
-from pydantic import BaseModel
+
 
 class OpenRoundResponse(BaseModel):
     id: UUID
