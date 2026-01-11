@@ -9,9 +9,9 @@ from app.models.round import Round
 
 # Configurações iniciais
 SOMMELIER_NAME = "Andre"
-SOMMELIER_PASSWORD = "Tchucos2708"  # <= senha curta, segura para bcrypt
+SOMMELIER_PASSWORD = "2708"  # <= senha curta, segura para bcrypt
 
-TEST_PARTICIPANT_NAME = "Maria"
+TEST_PARTICIPANT_NAME = "Samantha"
 EVENT_NAME = "Degustação Inicial"
 
 def init_mvp():
@@ -88,6 +88,21 @@ def init_mvp():
         print(f"Rodada 1 do evento '{EVENT_NAME}' criada.")
     else:
         print(f"Rodada 1 do evento '{EVENT_NAME}' já existe.")
+
+    round_ = db.query(Round).filter(Round.event_id == event.id, Round.position == 2).first()
+    if not round_:
+        round_ = Round(
+            id=str(uuid.uuid4()),
+            event_id=event.id,
+            position=2,
+            name="Rodada 2",
+            answer_released=False
+        )
+        db.add(round_)
+        db.commit()
+        print(f"Rodada 2 do evento '{EVENT_NAME}' criada.")
+    else:
+        print(f"Rodada 2 do evento '{EVENT_NAME}' já existe.")
 
     db.close()
     print("Inicialização do MVP concluída!")

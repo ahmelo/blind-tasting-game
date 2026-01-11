@@ -66,6 +66,8 @@ export default function SubmitVisual({ participantId, eventId, initialIsAnswerKe
 
   const [isAnswerKey, setIsAnswerKey] = useState<boolean>(initialIsAnswerKey);
 
+  const [canCloseRound, setCanCloseRound] = useState(false);
+  const [closingRound, setClosingRound] = useState(false);
 
   const [roundId, setRoundId] = useState<string | null>(null);
   const [roundName, setRoundName] = useState<string | null>(null);
@@ -99,10 +101,13 @@ export default function SubmitVisual({ participantId, eventId, initialIsAnswerKe
   }, []);
 
   useEffect(() => {
-    if (roundId) resetForm();
-    setIsAnswerKey(initialIsAnswerKey); // reseta o estado para o initial quando muda o round
-
+    if (roundId) {
+      resetForm();
+      setCanCloseRound(false);
+    }
+    setIsAnswerKey(initialIsAnswerKey);
   }, [roundId]);
+
 
   async function loadPendingRound() {
     setLoadingRound(true);
@@ -139,6 +144,25 @@ export default function SubmitVisual({ participantId, eventId, initialIsAnswerKe
     }
   }
 
+  async function closeRound() {
+    
+    if (!roundId) return;
+
+    setClosingRound(true);
+    setError("");
+
+    try {
+      await apiPost(`/rounds/${roundId}/close`, {});
+      setCanCloseRound(false);
+      await loadPendingRound(); // vai buscar o próximo round aberto
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch {
+      setError("Erro ao fechar a rodada.");
+    } finally {
+      setClosingRound(false);
+    }
+  }
+
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
@@ -170,9 +194,15 @@ export default function SubmitVisual({ participantId, eventId, initialIsAnswerKe
       >("/visual-evaluations", payload);
 
       setResult(res);
-      await new Promise((r) => setTimeout(r, 800));
-      await loadPendingRound();
-      setResult(null);
+
+      if(isAnswerKey){
+        setCanCloseRound(true);
+      } else{
+        await new Promise((r) => setTimeout(r, 800));
+        await loadPendingRound();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
     } catch {
       setError("Erro ao enviar avaliação.");
     } finally {
@@ -201,7 +231,7 @@ export default function SubmitVisual({ participantId, eventId, initialIsAnswerKe
       {result && <div className="alert alert-success">Enviado com sucesso</div>}
 
       {/* Limpidez */}
-      <fieldset className="group" disabled={loadingRound || !roundId}>
+      <fieldset className="group" disabled={loadingRound || !roundId || canCloseRound}>
         <legend className="group-title">Limpidez</legend>
         <div className="radio-grid">
           {limpidityOptions.map((opt) => (
@@ -219,7 +249,7 @@ export default function SubmitVisual({ participantId, eventId, initialIsAnswerKe
         </div>
       </fieldset>
 
-     <fieldset className="group" disabled={loadingRound || !roundId}>
+     <fieldset className="group" disabled={loadingRound || !roundId || canCloseRound}>
         <legend className="group-title">Intensidade</legend>
         <div className="radio-grid-list radio-grid--5">
           {intensityOptions.map((opt) => (
@@ -237,7 +267,7 @@ export default function SubmitVisual({ participantId, eventId, initialIsAnswerKe
         </div>
       </fieldset>
 
-      <fieldset className="group" disabled={loadingRound || !roundId}>
+      <fieldset className="group" disabled={loadingRound || !roundId || canCloseRound}>
         <legend className="group-title">Cor</legend>
         <div className="radio-grid-list">
           {colorTypeOptions.map((opt) => (
@@ -258,7 +288,7 @@ export default function SubmitVisual({ participantId, eventId, initialIsAnswerKe
         </div>
       </fieldset>
 
-      <fieldset className="group" disabled={loadingRound || !roundId}>
+      <fieldset className="group" disabled={loadingRound || !roundId || canCloseRound}>
         <legend className="group-title">Tom</legend>
         <div className="radio-grid-list">
           {toneOptions.map((t) => (
@@ -276,9 +306,22 @@ export default function SubmitVisual({ participantId, eventId, initialIsAnswerKe
         </div>
       </fieldset>
 
-      <button className="btn btn-primary" disabled={loading || loadingRound}>
-        {loading ? "Enviando..." : "Enviar avaliação"}
-      </button>
+      {!(isAnswerKey && canCloseRound) && (
+        <button className="btn btn-primary" disabled={loading || loadingRound}>
+          {loading ? "Enviando..." : "Enviar avaliação"}
+        </button>
+      )}
+      
+      {isAnswerKey && canCloseRound && roundId && (
+        <button
+          type="button"
+          className="btn btn-danger"
+          disabled={closingRound}
+          onClick={closeRound}
+        >
+          {closingRound ? "Fechando rodada..." : "Fechar rodada"}
+        </button>
+      )}
     </form>
   );
 }

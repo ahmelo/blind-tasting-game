@@ -10,9 +10,21 @@ from app.models.round import Round
 from app.models.event import Event
 from uuid import UUID
 from typing import List
+from app.services.round_service import RoundService
 
 
 router = APIRouter()
+
+@router.post("/rounds/{round_id}/close")
+def close_round(
+    round_id: str,
+    db: Session = Depends(get_db),
+):
+    try:
+        RoundService.close_round(db, round_id)
+        return {"status": "round_closed"}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 @router.post("/rounds/{round_id}/recalculate-scores")
 def recalculate_scores(
