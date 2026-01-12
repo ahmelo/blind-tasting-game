@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-from app.models.visual_evaluation import VisualEvaluation
+from app.models.evaluation import Evaluation
 from uuid import UUID
 from app.models.round import Round
 from fastapi import HTTPException
@@ -12,15 +12,15 @@ class RoundService:
     def get_round_ranking(db, round_id):
         return (
             db.query(
-                VisualEvaluation.participant_id,
-                func.sum(VisualEvaluation.score).label("total_score")
+                Evaluation.participant_id,
+                func.sum(Evaluation.score).label("total_score")
             )
             .filter(
-                VisualEvaluation.round_id == round_id,
-                VisualEvaluation.is_answer_key.is_(False)
+                Evaluation.round_id == round_id,
+                Evaluation.is_answer_key.is_(False)
             )
-            .group_by(VisualEvaluation.participant_id)
-            .order_by(func.sum(VisualEvaluation.score).desc())
+            .group_by(Evaluation.participant_id)
+            .order_by(func.sum(Evaluation.score).desc())
             .all()
         )
     

@@ -261,7 +261,7 @@
 .rounds-form{display:flex;flex-direction:column;gap:12px}
 .rounds-form-actions{display:flex;gap:10px;flex-wrap:wrap}
 
-/* Lista no estilo “SubmitVisual/Events” */
+/* Lista no estilo “Evaluation/Events” */
 .round-list{display:flex;flex-direction:column;gap:10px}
 
 .round-row{

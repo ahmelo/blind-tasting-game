@@ -18,8 +18,8 @@ class Round(Base):
     event = relationship("Event", back_populates="rounds")
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 
-    visual_evaluations = relationship(
-        "VisualEvaluation",
+    evaluations = relationship(
+        "Evaluation",
         back_populates="round",
         cascade="all, delete-orphan"
     )

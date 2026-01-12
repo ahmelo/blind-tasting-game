@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.api.v1.endpoints import visual_evaluations
+from app.api.v1.endpoints import evaluations
 from app.api.v1.endpoints import events
 from app.api.v1.endpoints import rounds
 from app.api.v1.endpoints import auth
@@ -8,8 +8,8 @@ from app.api.v1.endpoints import participants
 api_router = APIRouter()
 
 api_router.include_router(
-    visual_evaluations.router,
-    tags=["Visual Evaluations"]
+    evaluations.router,
+    tags=["Evaluations"]
 )
 
 api_router.include_router(

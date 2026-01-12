@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-from app.models.visual_evaluation import VisualEvaluation
+from app.models.evaluation import Evaluation
 from sqlalchemy import desc
 from app.models.round import Round
 from app.models.participant import Participant
@@ -15,16 +15,16 @@ class EventService:
             db.query(
                 Participant.id.label("participant_id"),
                 Participant.name.label("participant_name"),
-                func.sum(VisualEvaluation.score).label("total_score")
+                func.sum(Evaluation.score).label("total_score")
             )
-            .join(VisualEvaluation, VisualEvaluation.participant_id == Participant.id)
-            .join(Round, Round.id == VisualEvaluation.round_id)
+            .join(Evaluation, Evaluation.participant_id == Participant.id)
+            .join(Round, Round.id == Evaluation.round_id)
             .filter(
                 Round.event_id == event_id,
-                VisualEvaluation.is_answer_key.is_(False)
+                Evaluation.is_answer_key.is_(False)
             )
             .group_by(Participant.id, Participant.name)
-            .order_by(func.sum(VisualEvaluation.score).desc())
+            .order_by(func.sum(Evaluation.score).desc())
             .all()
         )
 

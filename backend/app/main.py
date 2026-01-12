@@ -9,7 +9,7 @@ from scripts.init_mvp import init_mvp
 from app.models.event import Event
 from app.models.participant import Participant
 from app.models.round import Round
-from app.models.visual_evaluation import VisualEvaluation
+from app.models.evaluation import Evaluation
 
 # cria as tabelas no startup (DEV only)
 Base.metadata.create_all(bind=engine)

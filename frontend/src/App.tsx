@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import Login from "./pages/Login";
-import SubmitVisual from "./pages/SubmitVisual";
+import Evaluation from "./pages/Evaluation";
 import Ranking from "./pages/Ranking";
 import Winner from "./pages/Winner";
 import Events from "./pages/Events";
@@ -25,6 +25,7 @@ export default function App() {
    * ========================= */
   const [sommelierView, setSommelierView] = useState<SommelierView>("menu");
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
+  const [roundId, setRoundId] = useState<string | null>(null);
   const [gabaritoEvents, setGabaritoEvents] = useState<
     Array<{ id: string; name: string; access_code?: string; is_open: boolean }>
   >([]);
@@ -179,7 +180,7 @@ export default function App() {
                   ))}
 
                 {selectedEventId && (
-                  <SubmitVisual
+                  <Evaluation
                     participantId={user.info.participant_id}
                     eventId={selectedEventId}
                     initialIsAnswerKey={true}
@@ -247,7 +248,7 @@ export default function App() {
           <div className="container stack">
 
             {eventIsOpen && (
-              <SubmitVisual
+              <Evaluation
                 participantId={user.info.participant_id}
                 eventId={user.info.event_id}
                 initialIsAnswerKey={false}

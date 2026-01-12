@@ -1,4 +1,4 @@
-from app.models.visual_evaluation import VisualEvaluation
+from app.models.evaluation import Evaluation
 from sqlalchemy.orm import Session
 
 
@@ -6,31 +6,70 @@ class ScoreService:
 
     @staticmethod
     def calculate_score(
-        evaluation: VisualEvaluation,
-        answer_key: VisualEvaluation
+        evaluation: Evaluation,
+        answer_key: Evaluation
     ) -> int:
         score = 0
 
         if evaluation.limpidity == answer_key.limpidity:
             score += 2
 
-        if evaluation.intensity == answer_key.intensity:
+        if evaluation.visualIntensity == answer_key.visualIntensity:
             score += 5
 
         if evaluation.color_type == answer_key.color_type:
-            score += 2
+            score += 3
 
         if evaluation.color_tone == answer_key.color_tone:
+            score += 3
+
+        if evaluation.condition == answer_key.condition:
+            score += 2
+
+        if evaluation.aromaIntensity == answer_key.aromaIntensity:
+            score += 5
+
+        if evaluation.aromas != None:
             score += 1
+        
+        if evaluation.sweetness == answer_key.sweetness:
+            score += 2
+
+        if evaluation.tannin == answer_key.tannin:
+            score += 5
+
+        if evaluation.alcohol == answer_key.alcohol:
+            score += 5
+
+        if evaluation.consistence == answer_key.consistence:
+            score += 5
+
+        if evaluation.acidity == answer_key.acidity:
+            score += 5
+
+        if evaluation.persistence == answer_key.persistence:
+            score += 5
+
+        if evaluation.flavors != None:
+            score += 1
+
+        if evaluation.grape == answer_key.grape:
+            score += 5
+        
+        if evaluation.country == answer_key.country:
+            score += 5
+        
+        if evaluation.vintage == answer_key.vintage:
+            score += 5
 
         return score
 
     @staticmethod
     def get_answer_key(db: Session, round_id):
         return (
-            db.query(VisualEvaluation)
-            .filter(VisualEvaluation.round_id == round_id)
-            .filter(VisualEvaluation.is_answer_key.is_(True))
+            db.query(Evaluation)
+            .filter(Evaluation.round_id == round_id)
+            .filter(Evaluation.is_answer_key.is_(True))
             .first()
         )
 
@@ -41,10 +80,10 @@ class ScoreService:
             raise ValueError("Não existe gabarito para esta rodada.")
 
         evaluations = (
-            db.query(VisualEvaluation)
+            db.query(Evaluation)
             .filter(
-                VisualEvaluation.round_id == round_id,
-                VisualEvaluation.is_answer_key.is_(False)
+                Evaluation.round_id == round_id,
+                Evaluation.is_answer_key.is_(False)
             )
             .all()
         )

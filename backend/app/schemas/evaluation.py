@@ -4,19 +4,36 @@ from datetime import datetime
 
 from app.enums.color_type import ColorType
 from app.enums.limpidity import Limpidity
+from app.enums.condition import Condition
+from app.enums.sweetness import Sweetness
 
-class VisualEvaluationBase(BaseModel):
+class EvaluationBase(BaseModel):
     participant_id: UUID
     round_id: UUID
     
     limpidity: Limpidity
-    intensity: int = Field(ge=1, le=5)
+    visualIntensity: int = Field(ge=1, le=5)
     color_type: ColorType
     color_tone: str
 
+    condition: Condition
+    aromaIntensity: int = Field(ge=1, le=5)
+    aromas: str | None = None
+    sweetness: Sweetness
+    tannin: int = Field(ge=1, le=5)
+    alcohol: int = Field(ge=1, le=5)
+    consistence: int = Field(ge=1, le=5)
+    acidity: int = Field(ge=1, le=5)
+    persistence: int = Field(ge=1, le=5)
+    flavors: str | None = None
+
+    grape: str | None = None
+    country: str | None = None
+    vintage: int | None = None
+
     is_answer_key: bool = False 
 
-class VisualEvaluationCreate(VisualEvaluationBase):
+class EvaluationCreate(EvaluationBase):
 
 
     @validator("color_tone")
@@ -42,7 +59,7 @@ class VisualEvaluationCreate(VisualEvaluationBase):
 
         return tone
 
-class VisualEvaluationResponse(VisualEvaluationBase):
+class EvaluationResponse(EvaluationBase):
     id: UUID
     participant_id: UUID
     round_id: UUID
