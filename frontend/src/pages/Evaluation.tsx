@@ -168,8 +168,6 @@ export default function Evaluation({ participantId, eventId, initialIsAnswerKey,
   const [country, setCountry] = useState<string>("");
   const [vintage, setVintage] = useState<string>("");
  
-  const [result, setResult] = useState<EvaluationResponse | null>(null);
-
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [waiting, setWaiting] = useState(false);
@@ -194,7 +192,6 @@ export default function Evaluation({ participantId, eventId, initialIsAnswerKey,
     setAcidity(null);
     setPersistence(null);
     setFlavors("");
-    setResult(null);
     setGrape("");
     setCountry("");
     setVintage("");
@@ -331,7 +328,6 @@ export default function Evaluation({ participantId, eventId, initialIsAnswerKey,
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
-    setResult(null);
 
     if (!roundId) return;
 
@@ -367,12 +363,10 @@ export default function Evaluation({ participantId, eventId, initialIsAnswerKey,
         is_answer_key: isAnswerKey,
       };
 
-      const res = await apiPost<
+      await apiPost<
         EvaluationCreate,
         EvaluationResponse
       >("/evaluations", payload);
-
-      setResult(res);
 
       if(isAnswerKey){
         setCanCloseRound(true);

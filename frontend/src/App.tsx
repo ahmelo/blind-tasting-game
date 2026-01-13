@@ -25,7 +25,6 @@ export default function App() {
    * ========================= */
   const [sommelierView, setSommelierView] = useState<SommelierView>("menu");
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
-  const [roundId, setRoundId] = useState<string | null>(null);
   const [gabaritoEvents, setGabaritoEvents] = useState<
     Array<{ id: string; name: string; access_code?: string; is_open: boolean }>
   >([]);
