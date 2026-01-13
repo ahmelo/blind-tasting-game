@@ -47,6 +47,7 @@ class EvaluationService:
             alcohol=payload.alcohol,
             persistence=payload.persistence,
             flavors=payload.flavors,
+            quality=payload.quality,
             grape=payload.grape,
             country=payload.country,
             vintage=payload.vintage

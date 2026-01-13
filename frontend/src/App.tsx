@@ -234,7 +234,7 @@ export default function App() {
             <div>
               <div className="topbar-title">Degustação às Cegas</div>
               <div className="topbar-subtitle">
-                Bem-vindo, {user.info.name}
+                Bem-vindo(a), {user.info.name}
               </div>
             </div>
           </div>

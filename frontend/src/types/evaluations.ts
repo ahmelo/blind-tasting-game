@@ -2,6 +2,7 @@ export type Limpidity = "limpido" | "turvo";
 export type ColorType = "branco" | "rose" | "tinto";
 export type Condition = "correto" | "defeituoso";
 export type Sweetness = "seco" | "demi-sec" | "doce";
+export type Quality = "pobre" | "aceitavel" | "boa" | "muito_boa" | "excelente";
 
 export type EvaluationCreate = {
   participant_id: string;
@@ -23,6 +24,7 @@ export type EvaluationCreate = {
   persistence: number; // 1..5
   flavors: string;
 
+  quality: Quality;
   grape?: string;
   country?: string;
   vintage?: number;

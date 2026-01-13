@@ -13,6 +13,7 @@ from app.enums.color_tone import ColorTone
 from app.enums.limpidity import Limpidity
 from app.enums.condition import Condition
 from app.enums.sweetness import Sweetness
+from app.enums.quality import Quality
 
 class Evaluation(Base):
     __tablename__ = "evaluations"
@@ -33,15 +34,16 @@ class Evaluation(Base):
     aromas = Column(String, nullable=True)
 
     ## Avaliação Gustativa
-    sweetness = Column(Enum(Sweetness, name="sweetness_enum"), nullable=True)
-    tannin = Column(Integer, nullable=True)
-    alcohol = Column(Integer, nullable=True)
-    consistence = Column(Integer, nullable=True)
-    acidity = Column(Integer, nullable=True)
-    persistence = Column(Integer, nullable=True)
+    sweetness = Column(Enum(Sweetness, name="sweetness_enum"), nullable=False)
+    tannin = Column(Integer, nullable=False)
+    alcohol = Column(Integer, nullable=False)
+    consistence = Column(Integer, nullable=False)
+    acidity = Column(Integer, nullable=False)
+    persistence = Column(Integer, nullable=False)
     flavors = Column(String, nullable=True)
 
     ## Dados Gerais do Vinho
+    quality = Column(Enum(Quality, name="quality_enum"), nullable=False)
     grape = Column(String, nullable=True)
     country = Column(String, nullable=True)
     vintage = Column(Integer, nullable=True)

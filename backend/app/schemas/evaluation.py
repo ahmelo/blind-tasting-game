@@ -6,6 +6,7 @@ from app.enums.color_type import ColorType
 from app.enums.limpidity import Limpidity
 from app.enums.condition import Condition
 from app.enums.sweetness import Sweetness
+from app.enums.quality import Quality
 
 class EvaluationBase(BaseModel):
     participant_id: UUID
@@ -27,6 +28,7 @@ class EvaluationBase(BaseModel):
     persistence: int = Field(ge=1, le=5)
     flavors: str | None = None
 
+    quality: Quality
     grape: str | None = None
     country: str | None = None
     vintage: int | None = None
