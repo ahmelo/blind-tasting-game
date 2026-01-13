@@ -23,7 +23,7 @@ app.add_middleware(
         "http://127.0.0.1:5173",
         "http://localhost:4173",  
         "http://127.0.0.1:4173",
-        "https://blind-tasting-game.vercel.app/",  # vamos ajustar depois
+        "https://blind-tasting-game.vercel.app",  # vamos ajustar depois
 
     ],
     allow_credentials=True,
