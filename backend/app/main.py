@@ -24,6 +24,7 @@ app.add_middleware(
         "http://localhost:4173",  
         "http://127.0.0.1:4173",
         "https://blind-tasting-game.vercel.app",  # vamos ajustar depois
+        "https://degust.savoirvin.com.br"
 
     ],
     allow_credentials=True,
