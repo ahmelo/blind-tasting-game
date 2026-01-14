@@ -108,7 +108,7 @@ desktop.ini
 .env
 .env.*
 !.env.example
-
+!.env.production
 # =========================
 # Python (backend)
 # =========================
