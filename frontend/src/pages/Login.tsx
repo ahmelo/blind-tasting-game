@@ -49,6 +49,11 @@ export default function Login({
   return (
     <div className="login-container">
       <div className="login-brand">
+        <img
+          src="/logo_app2.png"
+          alt="Savoir-Vin"
+          className="login-logo"
+        />
         <h1>Degustação às Cegas</h1>
         <p className="subtitle">Savoir-Vin</p>
       </div>
