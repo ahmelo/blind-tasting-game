@@ -264,18 +264,17 @@ export default function App() {
                 </button>
 
                 <div className="card stack">
+                  <Winner eventId={selectedEventId} />
+                </div>
+
+                <div className="card stack">
                   <div className="card-header">
                     <h2 className="h2">Ranking</h2>
                   </div>
                   <Ranking eventId={selectedEventId} />
                 </div>
 
-                <div className="card stack">
-                  <div className="card-header">
-                    <h2 className="h2">Vencedor</h2>
-                  </div>
-                  <Winner eventId={selectedEventId} />
-                </div>
+
               </div>
             )}
 
@@ -355,17 +354,14 @@ export default function App() {
             {eventIsOpen === false && (
               <>
                 <div className="card stack">
-                  <div className="card-header">
-                    <h2 className="h2">Ranking</h2>
-                  </div>
-                  <Ranking eventId={user.info.event_id} />
+                  <Winner eventId={user.info.event_id} />
                 </div>
 
                 <div className="card stack">
                   <div className="card-header">
-                    <h2 className="h2">Vencedor</h2>
+                    <h2 className="h2">Ranking</h2>
                   </div>
-                  <Winner eventId={user.info.event_id} />
+                  <Ranking eventId={user.info.event_id} />
                 </div>
               </>
             )}
