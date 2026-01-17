@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Login from "./pages/Login";
 import Evaluation from "./pages/Evaluation";
 import Ranking from "./pages/Ranking";
@@ -19,6 +19,10 @@ type SommelierView =
 
 export default function App() {
   const [user, setUser] = useState<{ type: UserType; info: any } | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement | null>(null);
+  const hamburgerRef = useRef<HTMLButtonElement | null>(null);
+
 
   /* =========================
    * SOMMELIER STATE
@@ -76,6 +80,33 @@ export default function App() {
   }, [sommelierView]);
 
   /* ============================================================
+   * Listener menu
+   * ============================================================ */
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      const target = event.target as Node;
+
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(target) &&
+        hamburgerRef.current &&
+        !hamburgerRef.current.contains(target)
+      ) {
+        setMenuOpen(false);
+      }
+    }
+
+    if (menuOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [menuOpen]);
+
+  /* ============================================================
    * LOGIN
    * ============================================================ */
   if (!user) {
@@ -97,9 +128,42 @@ export default function App() {
             </div>
           </div>
 
-          <button className="btn btn-outline" onClick={() => setUser(null)}>
-            Sair
-          </button>
+          <div className="topbar-right">
+            {/* Desktop */}
+            <button
+              className="btn btn-outline btn-logout-desktop"
+              onClick={() => {
+                setMenuOpen(false);
+                setUser(null);
+              }}
+            >
+              Sair
+            </button>
+
+            {/* Mobile */}
+            <button
+              ref={hamburgerRef}
+              className="hamburger"
+              onClick={() => setMenuOpen(!menuOpen)}
+              aria-label="Menu"
+            >
+              ☰
+            </button>
+          </div>
+
+          {menuOpen && (
+            <div ref={menuRef} className="mobile-menu">
+              <button
+                className="mobile-menu-item"
+                onClick={() => {
+                  setMenuOpen(false);
+                  setUser(null);
+                }}
+              >
+                Sair
+              </button>
+            </div>
+          )}
         </header>
 
         <main className="content">
@@ -238,9 +302,42 @@ export default function App() {
             </div>
           </div>
 
-          <button className="btn btn-outline" onClick={() => setUser(null)}>
-            Sair
-          </button>
+          <div className="topbar-right">
+            {/* Desktop */}
+            <button
+              className="btn btn-outline btn-logout-desktop"
+              onClick={() => {
+                setMenuOpen(false);
+                setUser(null);
+              }}
+            >
+              Sair
+            </button>
+
+            {/* Mobile */}
+            <button
+              ref={hamburgerRef}
+              className="hamburger"
+              onClick={() => setMenuOpen(!menuOpen)}
+              aria-label="Menu"
+            >
+              ☰
+            </button>
+          </div>
+
+          {menuOpen && (
+            <div ref={menuRef} className="mobile-menu">
+              <button
+                className="mobile-menu-item"
+                onClick={() => {
+                  setMenuOpen(false);
+                  setUser(null);
+                }}
+              >
+                Sair
+              </button>
+            </div>
+          )}
         </header>
 
         <main className="content">
