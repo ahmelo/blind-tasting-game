@@ -3,10 +3,15 @@ from uuid import UUID
 from datetime import datetime
 
 from app.enums.color_type import ColorType
+from app.enums.color_tone import ColorTone
 from app.enums.limpidity import Limpidity
 from app.enums.condition import Condition
 from app.enums.sweetness import Sweetness
 from app.enums.quality import Quality
+from typing import Optional
+from app.enums.grape import Grape
+from app.enums.country import Country
+from pydantic import Field
 
 class EvaluationBase(BaseModel):
     participant_id: UUID
@@ -15,13 +20,13 @@ class EvaluationBase(BaseModel):
     limpidity: Limpidity
     visualIntensity: int = Field(ge=1, le=5)
     color_type: ColorType
-    color_tone: str
+    color_tone: ColorTone
 
     condition: Condition
     aromaIntensity: int = Field(ge=1, le=5)
     aromas: str | None = None
     sweetness: Sweetness
-    tannin: int = Field(ge=1, le=5)
+    tannin: Optional[int] = Field(default=None, ge=1, le=5)
     alcohol: int = Field(ge=1, le=5)
     consistence: int = Field(ge=1, le=5)
     acidity: int = Field(ge=1, le=5)
@@ -29,8 +34,8 @@ class EvaluationBase(BaseModel):
     flavors: str | None = None
 
     quality: Quality
-    grape: str | None = None
-    country: str | None = None
+    grape: Grape | None = None
+    country: Country | None = None
     vintage: int | None = None
 
     is_answer_key: bool = False 

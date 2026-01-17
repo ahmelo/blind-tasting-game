@@ -14,6 +14,8 @@ from app.enums.limpidity import Limpidity
 from app.enums.condition import Condition
 from app.enums.sweetness import Sweetness
 from app.enums.quality import Quality
+from app.enums.country import Country
+from app.enums.grape import Grape
 
 class Evaluation(Base):
     __tablename__ = "evaluations"
@@ -44,8 +46,8 @@ class Evaluation(Base):
 
     ## Dados Gerais do Vinho
     quality = Column(Enum(Quality, name="quality_enum"), nullable=False)
-    grape = Column(String, nullable=True)
-    country = Column(String, nullable=True)
+    grape = Column(Enum(Grape, name="grape_enum"), nullable=True)
+    country = Column(Enum(Country, name="country_enum"), nullable=True)
     vintage = Column(Integer, nullable=True)
 
     ## Common Fields
@@ -61,7 +63,6 @@ class Evaluation(Base):
         UniqueConstraint("participant_id", "round_id"),
         CheckConstraint("visualIntensity BETWEEN 1 AND 5", name="ck_visual_intensity"),
         CheckConstraint("aromaIntensity BETWEEN 1 AND 5", name="ck_aroma_intensity"),
-        CheckConstraint("tannin BETWEEN 1 AND 5", name="ck_tannin"),
         CheckConstraint("acidity BETWEEN 1 AND 5", name="ck_acidity"),
         CheckConstraint("consistence BETWEEN 1 AND 5", name="ck_consistence"),
         CheckConstraint("alcohol BETWEEN 1 AND 5", name="ck_alcohol"),

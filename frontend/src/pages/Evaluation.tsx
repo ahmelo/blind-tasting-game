@@ -6,11 +6,12 @@ import type {
   Condition,
   Sweetness,
   Quality,
+  Grape,
+  Country,
   EvaluationCreate,
   EvaluationResponse,
 } from "../types/evaluations";
 import "../styles/evaluation.css";
-import AutocompleteInput from "../components/AutoCompletInput";
 
 type RoundApiItem = {
   id: string;
@@ -95,34 +96,79 @@ const qualityOptions: { value: Quality; label: string }[] = [
   { value: "excelente", label: "Excelente" },
 ];
 
-const grapeOptions = [
+const grapeOptions : Grape[] = [
+  "Airén",
+  "Albariño",
+  "Barbera",
+  "Cabernet Franc",
   "Cabernet Sauvignon",
-  "Merlot",
-  "Pinot Noir",
-  "Syrah",
-  "Malbec",
-  "Tempranillo",
-  "Sangiovese",
-  "Nebbiolo",
   "Chardonnay",
-  "Sauvignon Blanc",
+  "Chenin Blanc",
+  "Colombard",
+  "Gamay",
+  "Garnacha",
+  "Gewürztraminer",
+  "Macabeo",
+  "Malbec",
+  "Merlot",
+  "Monastrell",
+  "Moscato",
+  "Nebbiolo",
+  "Pinot Grigio",
+  "Pinot Noir",
   "Riesling",
+  "Sangiovese",
+  "Sauvignon Blanc",
+  "Semillon",
+  "Syrah",
+  "Tempranillo",
+  "Touriga Nacional",
+  "Trebbiano",
+  "Verdejo",
   "Viognier",
+  "Zinfandel"
 ];
 
 const countryOptions = [
-  "Argentina",
-  "Austrália",
   "África do Sul",
+  "Alemanha",
+  "Argentina",
+  "Armênia",
+  "Austrália",
+  "Áustria",
+  "Bélgica",
+  "Bolívia",
   "Brasil",
+  "Bulgária",
+  "Canadá",
   "Chile",
+  "China",
+  "Croácia",
+  "Dinamarca",
+  "Eslovênia",
   "Espanha",
   "Estados Unidos",
   "França",
+  "Geórgia",
+  "Grécia",
+  "Hungria",
+  "Israel",
   "Itália",
+  "Líbano",
+  "Macedônia do Norte",
+  "Marrocos",
+  "México",
+  "Moldávia",
   "Nova Zelândia",
+  "Países Baixos",
   "Portugal",
-  "Alemanha",
+  "Reino Unido",
+  "República Tcheca",
+  "Romênia",
+  "Suíça",
+  "Tailândia",
+  "Tunísia",
+  "Uruguai"
 ];
 
 
@@ -153,7 +199,7 @@ export default function Evaluation({ participantId, eventId, initialIsAnswerKey,
 
   const [condition, setCondition] = useState<Condition | null>(null);
   const [aromaIntensity, setAromaIntensity] = useState<number | null>(null);
-  const [aromas, setAromas] = useState<string>("");
+  const [aromas, setAromas] = useState<string | null>(null);
 
   const [sweetness, setSweetness] = useState<Sweetness | null>(null);
   const [tannin, setTannin] = useState<number | null>(null);
@@ -161,12 +207,12 @@ export default function Evaluation({ participantId, eventId, initialIsAnswerKey,
   const [consistence, setConsistence] = useState<number | null>(null);
   const [acidity, setAcidity] = useState<number | null>(null);
   const [persistence, setPersistence] = useState<number | null>(null);
-  const [flavors, setFlavors] = useState<string>("");
+  const [flavors, setFlavors] = useState<string | null>(null);
 
   const [quality, setQuality] = useState<Quality | null>(null);
-  const [grape, setGrape] = useState<string>("");
-  const [country, setCountry] = useState<string>("");
-  const [vintage, setVintage] = useState<string>("");
+  const [grape, setGrape] = useState<Grape | null>(null);
+  const [country, setCountry] = useState<Country | null>(null);
+  const [vintage, setVintage] = useState<string | null>(null);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -184,17 +230,18 @@ export default function Evaluation({ participantId, eventId, initialIsAnswerKey,
     setColorTone(null);
     setCondition(null);
     setAromaIntensity(null);
-    setAromas("");
+    setAromas(null);
     setSweetness(null);
     setTannin(null);
     setAlcohol(null);
     setConsistence(null);
     setAcidity(null);
     setPersistence(null);
-    setFlavors("");
-    setGrape("");
-    setCountry("");
-    setVintage("");
+    setFlavors(null);
+    setQuality(null);
+    setGrape(null);
+    setCountry(null);
+    setVintage(null);
   }
 
   function isEvaluationComplete() {
@@ -350,19 +397,20 @@ export default function Evaluation({ participantId, eventId, initialIsAnswerKey,
         limpidity: limpidity!,
         condition: condition!,
         aromaIntensity: aromaIntensity!,
-        aromas: aromas,
+        aromas: aromas!,
         sweetness: sweetness!,
-        tannin: tannin!,
+        //        tannin: tannin!,
         alcohol: alcohol!,
         consistence: consistence!,
         acidity: acidity!,
         persistence: persistence!,
-        flavors: flavors,
+        flavors: flavors!,
         quality: quality!,
         grape: grape!,
         country: country!,
-        vintage: vintage ? parseInt(vintage) : undefined,
+        vintage: vintage ? parseInt(vintage) : 0,
         is_answer_key: isAnswerKey,
+        ...(colorType !== "branco" && { tannin: tannin! })
       };
 
       await apiPost<
@@ -560,7 +608,7 @@ export default function Evaluation({ participantId, eventId, initialIsAnswerKey,
             name="aroma"
             className="input"
             placeholder="Descreva os aromas percebidos"
-            value={aromas}
+            value={aromas?.valueOf() ?? ""}
             onChange={(e) => setAromas(e.target.value)}
           />
         </fieldset>
@@ -695,7 +743,7 @@ export default function Evaluation({ participantId, eventId, initialIsAnswerKey,
             name="sabor"
             className="input"
             placeholder="Descreva os sabores percebidos"
-            value={flavors}
+            value={flavors?.valueOf() ?? ""}
             onChange={(e) => setFlavors(e.target.value)}
           />
         </fieldset>
@@ -731,35 +779,47 @@ export default function Evaluation({ participantId, eventId, initialIsAnswerKey,
           </div>
         </fieldset>
 
-
         {/* Uva */}
         <fieldset className="group" disabled={loadingRound || !roundId || canCloseRound}>
           <legend className="group-title">Uva Principal</legend>
-          <AutocompleteInput
-            placeholder="Digite a uva"
-            options={grapeOptions}
-            value={grape}
-            onChange={setGrape}
-            disabled={loadingRound || !roundId || canCloseRound}
-          />
+
+          <div className="field">
+            <select
+              className="select select--clean"
+              value={grape ?? ""}
+              onChange={(e) => setGrape(e.target.value as Grape)}
+            >
+              <option value="">Selecione a uva</option>
+
+              {grapeOptions.map((g) => (
+                <option key={g} value={g}>
+                  {g}
+                </option>
+              ))}
+            </select>
+          </div>
         </fieldset>
 
         {/* País */}
-        <fieldset
-          className="group"
-          disabled={loadingRound || !roundId || canCloseRound}
-        >
+        <fieldset className="group" disabled={loadingRound || !roundId || canCloseRound}>
           <legend className="group-title">País</legend>
 
-          <AutocompleteInput
-            placeholder="Digite o país"
-            options={countryOptions}
-            value={country}
-            onChange={setCountry}
-            disabled={loadingRound || !roundId || canCloseRound}
-          />
-        </fieldset>
+          <div className="field">
+            <select
+              className="select select--clean"
+              value={country ?? ""}
+              onChange={(e) => setCountry(e.target.value as Country)}
+            >
+              <option value="">Selecione o país</option>
 
+              {countryOptions.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
+          </div>
+        </fieldset>
 
         {/* Ano */}
         <fieldset className="group" disabled={loadingRound || !roundId || canCloseRound}>
@@ -769,7 +829,7 @@ export default function Evaluation({ participantId, eventId, initialIsAnswerKey,
             name="vintage"
             className="input"
             placeholder="Qual o ano de produção do vinho?"
-            value={vintage}
+            value={vintage?.valueOf() ?? ""}
             inputMode="numeric"
             pattern="[0-9]*"
             min="1900"
