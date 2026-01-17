@@ -35,7 +35,7 @@ class Evaluation(Base):
 
     ## Avaliação Gustativa
     sweetness = Column(Enum(Sweetness, name="sweetness_enum"), nullable=False)
-    tannin = Column(Integer, nullable=False)
+    tannin = Column(Integer, nullable=True)
     alcohol = Column(Integer, nullable=False)
     consistence = Column(Integer, nullable=False)
     acidity = Column(Integer, nullable=False)

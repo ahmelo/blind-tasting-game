@@ -154,7 +154,7 @@ export default function Evaluation({ participantId, eventId, initialIsAnswerKey,
   const [condition, setCondition] = useState<Condition | null>(null);
   const [aromaIntensity, setAromaIntensity] = useState<number | null>(null);
   const [aromas, setAromas] = useState<string>("");
-  
+
   const [sweetness, setSweetness] = useState<Sweetness | null>(null);
   const [tannin, setTannin] = useState<number | null>(null);
   const [alcohol, setAlcohol] = useState<number | null>(null);
@@ -167,7 +167,7 @@ export default function Evaluation({ participantId, eventId, initialIsAnswerKey,
   const [grape, setGrape] = useState<string>("");
   const [country, setCountry] = useState<string>("");
   const [vintage, setVintage] = useState<string>("");
- 
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [waiting, setWaiting] = useState(false);
@@ -198,27 +198,29 @@ export default function Evaluation({ participantId, eventId, initialIsAnswerKey,
   }
 
   function isEvaluationComplete() {
-  return (
-    limpidity &&
-    colorType &&
-    colorTone &&
-    visualIntensity != null &&
+    const isTanninOk =
+      colorType === "branco" ? true : tannin != null;
+    return (
+      limpidity &&
+      colorType &&
+      colorTone &&
+      visualIntensity != null &&
 
-    condition &&
-    aromaIntensity != null &&
+      condition &&
+      aromaIntensity != null &&
 
-    sweetness &&
-    tannin != null &&
-    alcohol != null &&
-    consistence != null &&
-    acidity != null &&
-    persistence != null &&
-    
-    quality &&
-    country &&
-    grape
-  );
-}
+      sweetness &&
+      isTanninOk &&
+      alcohol != null &&
+      consistence != null &&
+      acidity != null &&
+      persistence != null &&
+
+      quality &&
+      country &&
+      grape
+    );
+  }
 
 
   useEffect(() => {
@@ -291,7 +293,7 @@ export default function Evaluation({ participantId, eventId, initialIsAnswerKey,
   }
 
   async function closeRound() {
-    
+
     if (!roundId) return;
 
     setClosingRound(true);
@@ -301,7 +303,7 @@ export default function Evaluation({ participantId, eventId, initialIsAnswerKey,
       await apiPost(`/rounds/${roundId}/close`, {});
       setCanCloseRound(false);
       await loadPendingRound(); // vai buscar o próximo round aberto
- //     window.scrollTo({ top: 0, behavior: "smooth" });
+      //     window.scrollTo({ top: 0, behavior: "smooth" });
     } catch {
       setError("Erro ao fechar a rodada.");
     } finally {
@@ -368,12 +370,12 @@ export default function Evaluation({ participantId, eventId, initialIsAnswerKey,
         EvaluationResponse
       >("/evaluations", payload);
 
-      if(isAnswerKey){
+      if (isAnswerKey) {
         setCanCloseRound(true);
-      } else{
+      } else {
         await new Promise((r) => setTimeout(r, 800));
         await loadPendingRound();
-  //      window.scrollTo({ top: 0, behavior: "smooth" });
+        //      window.scrollTo({ top: 0, behavior: "smooth" });
       }
 
     } catch {
@@ -442,8 +444,8 @@ export default function Evaluation({ participantId, eventId, initialIsAnswerKey,
           </div>
         </fieldset>
 
-      {/* Intensidade Visual */}     
-      <fieldset className="group" disabled={loadingRound || !roundId || canCloseRound}>
+        {/* Intensidade Visual */}
+        <fieldset className="group" disabled={loadingRound || !roundId || canCloseRound}>
           <legend className="group-title">Intensidade</legend>
           <div className="radio-grid">
             {intensityOptions.map((opt) => (
@@ -475,6 +477,9 @@ export default function Evaluation({ participantId, eventId, initialIsAnswerKey,
                   onChange={() => {
                     setColorType(opt.value);
                     setColorTone(null);
+                    if (opt.value === "branco") {
+                      setTannin(null);
+                    }
                   }}
                 />
                 <span className="radio-label">{opt.label}</span>
@@ -528,7 +533,7 @@ export default function Evaluation({ participantId, eventId, initialIsAnswerKey,
           </div>
         </fieldset>
 
-        {/* Intensidade Visual */}     
+        {/* Intensidade Visual */}
         <fieldset className="group" disabled={loadingRound || !roundId || canCloseRound}>
           <legend className="group-title">Intensidade</legend>
           <div className="radio-grid">
@@ -547,17 +552,17 @@ export default function Evaluation({ participantId, eventId, initialIsAnswerKey,
           </div>
         </fieldset>
 
-        {/* Aromas */}     
+        {/* Aromas */}
         <fieldset className="group" disabled={loadingRound || !roundId || canCloseRound}>
           <legend className="group-title">Aromas</legend>
-            <input
-              type="text"
-              name="aroma"
-              className="input"
-              placeholder="Descreva os aromas percebidos" 
-              value={aromas}
-              onChange={(e) => setAromas(e.target.value)}
-            />
+          <input
+            type="text"
+            name="aroma"
+            className="input"
+            placeholder="Descreva os aromas percebidos"
+            value={aromas}
+            onChange={(e) => setAromas(e.target.value)}
+          />
         </fieldset>
 
       </fieldset>
@@ -566,26 +571,27 @@ export default function Evaluation({ participantId, eventId, initialIsAnswerKey,
       <fieldset className="group" disabled={loadingRound || !roundId || canCloseRound}>
         <legend className="group-title">Avaliação Gustativa</legend>
 
-          {/* Doçura */}     
-          <fieldset className="group" disabled={loadingRound || !roundId || canCloseRound}>
-            <legend className="group-title">Doçura</legend>
-            <div className="radio-grid">
-              {sweetnessOptions.map((opt) => (
-                <label key={opt.value} className="radio-card">
-                  <input
-                    type="radio"
-                    name="sweetness"
-                    value={opt.value}
-                    checked={sweetness === opt.value}
-                    onChange={() => setSweetness(opt.value)}
-                  />
-                  <span className="radio-label">{opt.label}</span>
-                </label>
-              ))}
-            </div>
-          </fieldset>
+        {/* Doçura */}
+        <fieldset className="group" disabled={loadingRound || !roundId || canCloseRound}>
+          <legend className="group-title">Doçura</legend>
+          <div className="radio-grid">
+            {sweetnessOptions.map((opt) => (
+              <label key={opt.value} className="radio-card">
+                <input
+                  type="radio"
+                  name="sweetness"
+                  value={opt.value}
+                  checked={sweetness === opt.value}
+                  onChange={() => setSweetness(opt.value)}
+                />
+                <span className="radio-label">{opt.label}</span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
 
-          {/* Taninos */}     
+        {/* Taninos */}
+        {colorType !== "branco" && (
           <fieldset className="group" disabled={loadingRound || !roundId || canCloseRound}>
             <legend className="group-title">Taninos</legend>
             <div className="radio-grid">
@@ -603,99 +609,100 @@ export default function Evaluation({ participantId, eventId, initialIsAnswerKey,
               ))}
             </div>
           </fieldset>
+        )}
 
-          {/* Álcool */}     
-          <fieldset className="group" disabled={loadingRound || !roundId || canCloseRound}>
-            <legend className="group-title">Álcool</legend>
-            <div className="radio-grid">
-              {intensityOptions2.map((opt) => (
-                <label key={opt.value} className="radio-card">
-                  <input
-                    type="radio"
-                    name="alcohol"
-                    value={opt.value}
-                    checked={alcohol === opt.value}
-                    onChange={() => setAlcohol(opt.value)}
-                  />
-                  <span className="radio-label">{opt.label}</span>
-                </label>
-              ))}
-            </div>
-          </fieldset>
+        {/* Álcool */}
+        <fieldset className="group" disabled={loadingRound || !roundId || canCloseRound}>
+          <legend className="group-title">Álcool</legend>
+          <div className="radio-grid">
+            {intensityOptions2.map((opt) => (
+              <label key={opt.value} className="radio-card">
+                <input
+                  type="radio"
+                  name="alcohol"
+                  value={opt.value}
+                  checked={alcohol === opt.value}
+                  onChange={() => setAlcohol(opt.value)}
+                />
+                <span className="radio-label">{opt.label}</span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
 
-          {/* Corpo */}     
-          <fieldset className="group" disabled={loadingRound || !roundId || canCloseRound}>
-            <legend className="group-title">Corpo</legend>
-            <div className="radio-grid">
-              {intensityOptions2.map((opt) => (
-                <label key={opt.value} className="radio-card">
-                  <input
-                    type="radio"
-                    name="consistence"
-                    value={opt.value}
-                    checked={consistence === opt.value}
-                    onChange={() => setConsistence(opt.value)}
-                  />
-                  <span className="radio-label">{opt.label}</span>
-                </label>
-              ))}
-            </div>
-          </fieldset>
+        {/* Corpo */}
+        <fieldset className="group" disabled={loadingRound || !roundId || canCloseRound}>
+          <legend className="group-title">Corpo</legend>
+          <div className="radio-grid">
+            {intensityOptions2.map((opt) => (
+              <label key={opt.value} className="radio-card">
+                <input
+                  type="radio"
+                  name="consistence"
+                  value={opt.value}
+                  checked={consistence === opt.value}
+                  onChange={() => setConsistence(opt.value)}
+                />
+                <span className="radio-label">{opt.label}</span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
 
-          {/* Acidez */}     
-          <fieldset className="group" disabled={loadingRound || !roundId || canCloseRound}>
-            <legend className="group-title">Acidez</legend>
-            <div className="radio-grid">
-              {intensityOptions.map((opt) => (
-                <label key={opt.value} className="radio-card">
-                  <input
-                    type="radio"
-                    name="acidity"
-                    value={opt.value}
-                    checked={acidity === opt.value}
-                    onChange={() => setAcidity(opt.value)}
-                  />
-                  <span className="radio-label">{opt.label}</span>
-                </label>
-              ))}
-            </div>
-          </fieldset>
+        {/* Acidez */}
+        <fieldset className="group" disabled={loadingRound || !roundId || canCloseRound}>
+          <legend className="group-title">Acidez</legend>
+          <div className="radio-grid">
+            {intensityOptions.map((opt) => (
+              <label key={opt.value} className="radio-card">
+                <input
+                  type="radio"
+                  name="acidity"
+                  value={opt.value}
+                  checked={acidity === opt.value}
+                  onChange={() => setAcidity(opt.value)}
+                />
+                <span className="radio-label">{opt.label}</span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
 
-          {/* Final */}     
-          <fieldset className="group" disabled={loadingRound || !roundId || canCloseRound}>
-            <legend className="group-title">Final</legend>
-            <div className="radio-grid">
-              {intensityOptions3.map((opt) => (
-                <label key={opt.value} className="radio-card">
-                  <input
-                    type="radio"
-                    name="persistence"
-                    value={opt.value}
-                    checked={persistence === opt.value}
-                    onChange={() => setPersistence(opt.value)}
-                  />
-                  <span className="radio-label">{opt.label}</span>
-                </label>
-              ))}
-            </div>
-          </fieldset>
+        {/* Final */}
+        <fieldset className="group" disabled={loadingRound || !roundId || canCloseRound}>
+          <legend className="group-title">Final</legend>
+          <div className="radio-grid">
+            {intensityOptions3.map((opt) => (
+              <label key={opt.value} className="radio-card">
+                <input
+                  type="radio"
+                  name="persistence"
+                  value={opt.value}
+                  checked={persistence === opt.value}
+                  onChange={() => setPersistence(opt.value)}
+                />
+                <span className="radio-label">{opt.label}</span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
 
-          {/* Sabores */}     
-          <fieldset className="group" disabled={loadingRound || !roundId || canCloseRound}>
-            <legend className="group-title">Sabores</legend>
-              <input
-                type="text"
-                name="sabor"
-                className="input"
-                placeholder="Descreva os sabores percebidos" 
-                value={flavors}
-                onChange={(e) => setFlavors(e.target.value)}
-              />
-          </fieldset>
+        {/* Sabores */}
+        <fieldset className="group" disabled={loadingRound || !roundId || canCloseRound}>
+          <legend className="group-title">Sabores</legend>
+          <input
+            type="text"
+            name="sabor"
+            className="input"
+            placeholder="Descreva os sabores percebidos"
+            value={flavors}
+            onChange={(e) => setFlavors(e.target.value)}
+          />
+        </fieldset>
 
       </fieldset>
 
-      {/* Informações Adicionais */}     
+      {/* Informações Adicionais */}
       <fieldset className="group" disabled={loadingRound || !roundId || canCloseRound}>
         <legend className="group-title">Informações Adicionais</legend>
 
@@ -725,51 +732,51 @@ export default function Evaluation({ participantId, eventId, initialIsAnswerKey,
         </fieldset>
 
 
-          {/* Uva */}     
-          <fieldset className="group" disabled={loadingRound || !roundId || canCloseRound}>
-            <legend className="group-title">Uva Principal</legend>
-              <AutocompleteInput
-                placeholder="Digite a uva"
-                options={grapeOptions}
-                value={grape}
-                onChange={setGrape}
-                disabled={loadingRound || !roundId || canCloseRound}
-              />
-          </fieldset>
-
-          {/* País */}
-          <fieldset
-            className="group"
+        {/* Uva */}
+        <fieldset className="group" disabled={loadingRound || !roundId || canCloseRound}>
+          <legend className="group-title">Uva Principal</legend>
+          <AutocompleteInput
+            placeholder="Digite a uva"
+            options={grapeOptions}
+            value={grape}
+            onChange={setGrape}
             disabled={loadingRound || !roundId || canCloseRound}
-          >
-            <legend className="group-title">País</legend>
+          />
+        </fieldset>
 
-            <AutocompleteInput
-              placeholder="Digite o país"
-              options={countryOptions}
-              value={country}
-              onChange={setCountry}
-              disabled={loadingRound || !roundId || canCloseRound}
-            />
-          </fieldset>
+        {/* País */}
+        <fieldset
+          className="group"
+          disabled={loadingRound || !roundId || canCloseRound}
+        >
+          <legend className="group-title">País</legend>
+
+          <AutocompleteInput
+            placeholder="Digite o país"
+            options={countryOptions}
+            value={country}
+            onChange={setCountry}
+            disabled={loadingRound || !roundId || canCloseRound}
+          />
+        </fieldset>
 
 
-          {/* Ano */}     
-          <fieldset className="group" disabled={loadingRound || !roundId || canCloseRound}>
-            <legend className="group-title">Ano</legend>
-              <input
-                type="number"
-                name="vintage"
-                className="input"
-                placeholder="Qual o ano de produção do vinho?"
-                value={vintage}
-                inputMode="numeric"
-                pattern="[0-9]*"
-                min="1900"
-                max={new Date().getFullYear()}
-                onChange={(e) => setVintage(e.target.value)}
-              />
-          </fieldset>
+        {/* Ano */}
+        <fieldset className="group" disabled={loadingRound || !roundId || canCloseRound}>
+          <legend className="group-title">Ano</legend>
+          <input
+            type="number"
+            name="vintage"
+            className="input"
+            placeholder="Qual o ano de produção do vinho?"
+            value={vintage}
+            inputMode="numeric"
+            pattern="[0-9]*"
+            min="1900"
+            max={new Date().getFullYear()}
+            onChange={(e) => setVintage(e.target.value)}
+          />
+        </fieldset>
 
 
       </fieldset>
@@ -779,7 +786,7 @@ export default function Evaluation({ participantId, eventId, initialIsAnswerKey,
           {loading ? "Enviando..." : "Enviar avaliação"}
         </button>
       )}
-      
+
       {isAnswerKey && canCloseRound && roundId && (
         <button
           type="button"
