@@ -24,6 +24,7 @@ export default function App() {
   const menuRef = useRef<HTMLDivElement | null>(null);
   const hamburgerRef = useRef<HTMLButtonElement | null>(null);
   const [showResult, setShowResult] = useState(false);
+  const [roundIds, setRoundIds] = useState<string[]>([]);
 
   /* =========================
    * SOMMELIER STATE
@@ -54,6 +55,14 @@ export default function App() {
           (e) => e.id === participant.info.event_id
         );
         setEventIsOpen(ev ? ev.is_open : false);
+
+        // Quando evento fecha, busca todos os rounds do evento
+        if (ev && !ev.is_open) {
+          const rounds = await apiGet<any[]>(
+            `/rounds?event_id=${participant.info.event_id}`
+          );
+          setRoundIds(rounds.map((r) => r.id));
+        }
       } catch {
         setEventIsOpen(false);
       }
@@ -381,7 +390,7 @@ export default function App() {
             {/* Tela de Resultado do Participante */}
             {showResult && (
               <ParticipantResult
-                roundId={user.info.event_id} // ou round atual se você quiser por round específico
+                roundIds={roundIds}
                 onBack={() => setShowResult(false)}
               />
             )}

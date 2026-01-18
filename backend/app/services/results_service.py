@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from app.models.evaluation import Evaluation
 from app.enums.scale_type import resolve_scale_label, ATTRIBUTE_SCALE
 from app.core.database import get_db
-
+from fastapi import HTTPException
 
 # -----------------------------
 # Definição dos blocos e campos
@@ -137,7 +137,7 @@ def build_participant_result(
                 Evaluation.round_id == round_id,
                 Evaluation.is_answer_key == False,
             )
-            .first()
+            .one_or_none()
         )
 
         answer_key_eval = (
@@ -146,11 +146,21 @@ def build_participant_result(
                 Evaluation.round_id == round_id,
                 Evaluation.is_answer_key == True,
             )
-            .first()
+            .one_or_none()
         )
 
-        if not participant_eval or not answer_key_eval:
-            raise ValueError("Avaliação ou gabarito não encontrado.")
+        if not participant_eval:
+            raise HTTPException(
+                status_code=404,
+                detail="Participante não respondeu este round."
+            )
+
+        if not answer_key_eval:
+            raise HTTPException(
+                status_code=409,
+                detail="Resultado ainda não disponível para este round."
+            )
+
 
         blocks = []
 
