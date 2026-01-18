@@ -4,12 +4,18 @@ from app.api.v1.endpoints import events
 from app.api.v1.endpoints import rounds
 from app.api.v1.endpoints import auth
 from app.api.v1.endpoints import participants
+from app.api.v1.endpoints import results
 
 api_router = APIRouter()
 
 api_router.include_router(
     evaluations.router,
     tags=["Evaluations"]
+)
+
+api_router.include_router(
+    results.router,
+    tags=["Results"]
 )
 
 api_router.include_router(

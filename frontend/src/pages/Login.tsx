@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { apiPost } from "../api/client";
+import { apiPost, setParticipantSession } from "../api/client";
 import "../styles/login.css";
 
 type UserType = "sommelier" | "participant" | null;
@@ -36,6 +36,7 @@ export default function Login({
           );
           setError(null);
           onLogin("participant", data);
+          setParticipantSession(data.participant_id);
         } catch (err: any) {
           setError(err?.message || "Erro ao participar do evento");
         }

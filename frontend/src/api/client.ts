@@ -21,8 +21,22 @@ export async function apiPost<TReq, TRes>(path: string, body: TReq): Promise<TRe
   return res.json() as Promise<TRes>;
 }
 
+export function setParticipantSession(participantId: string) {
+  localStorage.setItem("participant_id", participantId);
+}
+
+function getParticipantId() {
+  return localStorage.getItem("participant_id");
+}
+
 export async function apiGet<TRes>(path: string): Promise<TRes> {
-  const res = await fetch(`${API_BASE}${path}`);
+  const participantId = getParticipantId();
+  const res = await fetch(`${API_BASE}${path}`, {
+    headers: {
+      ...API_BASE(participantId && { "X-Participant-Id": participantId }),
+    },
+  });
+
   if (!res.ok) throw new Error(await res.text());
   return res.json() as Promise<TRes>;
 }
