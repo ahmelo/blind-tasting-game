@@ -42,6 +42,23 @@ class EvaluationBase(BaseModel):
 
 class EvaluationCreate(EvaluationBase):
 
+    @validator("tannin")
+    def validate_tannin(cls, value, values):
+        color_type = values.get("color_type")
+        
+        # Tannin é obrigatório para vinhos tinto e rosé
+        if color_type in ["tinto", "rose"] and value is None:
+            raise ValueError(
+                f"Tanino é obrigatório para vinho {color_type}"
+            )
+        
+        # Tannin deve ser None para vinho branco
+        if color_type == "branco" and value is not None:
+            raise ValueError(
+                "Vinho branco não deve ter valor de tanino"
+            )
+        
+        return value
 
     @validator("color_tone")
     def validate_color_tone(cls, tone, values):

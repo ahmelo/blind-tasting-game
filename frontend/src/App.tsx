@@ -5,6 +5,7 @@ import Ranking from "./pages/Ranking";
 import Winner from "./pages/Winner";
 import Events from "./pages/Events";
 import Rounds from "./pages/Rounds";
+import ParticipantResult from "./pages/ParticipantResult";
 import { apiGet } from "./api/client";
 import "./styles/ui.css";
 
@@ -22,7 +23,7 @@ export default function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
   const hamburgerRef = useRef<HTMLButtonElement | null>(null);
-
+  const [showResult, setShowResult] = useState(false);
 
   /* =========================
    * SOMMELIER STATE
@@ -288,6 +289,7 @@ export default function App() {
    * PARTICIPANTE
    * ============================================================ */
   if (user.type === "participant") {
+    
     return (
       <div className="app-shell">
         <header className="topbar">
@@ -350,8 +352,9 @@ export default function App() {
                 onEventClosed={() => setEventIsOpen(false)}
               />
             )}
-
-            {eventIsOpen === false && (
+  
+            {/* Evento finalizado → Ranking + Winner + botão Ver Resultado */}
+            {eventIsOpen === false && !showResult && (
               <>
                 <div className="card stack">
                   <Winner eventId={user.info.event_id} />
@@ -363,8 +366,27 @@ export default function App() {
                   </div>
                   <Ranking eventId={user.info.event_id} />
                 </div>
+
+                <div className="stack" style={{ marginTop: "1rem" }}>
+                  <button
+                    className="btn btn-primary"
+                    onClick={() => setShowResult(true)}
+                  >
+                    Ver Resultado
+                  </button>
+                </div>
               </>
             )}
+
+            {/* Tela de Resultado do Participante */}
+            {showResult && (
+              <ParticipantResult
+                roundId={user.info.event_id} // ou round atual se você quiser por round específico
+                onBack={() => setShowResult(false)}
+              />
+            )}
+
+
 
           </div>
         </main>

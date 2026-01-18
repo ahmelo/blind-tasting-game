@@ -90,9 +90,9 @@ const sweetnessOptions: { value: Sweetness; label: string }[] = [
 
 const qualityOptions: { value: Quality; label: string }[] = [
   { value: "pobre", label: "Pobre" },
-  { value: "aceitavel", label: "Aceitável" },
+  { value: "aceitável", label: "Aceitável" },
   { value: "boa", label: "Boa" },
-  { value: "muito_boa", label: "Muito Boa" },
+  { value: "muito boa", label: "Muito Boa" },
   { value: "excelente", label: "Excelente" },
 ];
 
@@ -410,7 +410,7 @@ export default function Evaluation({ participantId, eventId, initialIsAnswerKey,
         country: country!,
         vintage: vintage ? parseInt(vintage) : 0,
         is_answer_key: isAnswerKey,
-        ...(colorType !== "branco" && { tannin: tannin! })
+        ...(colorType !== "branco" && tannin !== null && { tannin: tannin })
       };
 
       await apiPost<

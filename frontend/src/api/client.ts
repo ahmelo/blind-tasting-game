@@ -33,7 +33,9 @@ export async function apiGet<TRes>(path: string): Promise<TRes> {
   const participantId = getParticipantId();
   const res = await fetch(`${API_BASE}${path}`, {
     headers: {
-      ...API_BASE(participantId && { "X-Participant-Id": participantId }),
+      ...(participantId
+        ? { "X-Participant-Id": participantId }
+        : {}),
     },
   });
 

@@ -35,7 +35,8 @@ class ScoreService:
         if evaluation.sweetness == answer_key.sweetness:
             score += 2
 
-        if evaluation.tannin == answer_key.tannin:
+        # Tannin só é comparado se ambos têm valor (não é branco)
+        if evaluation.tannin is not None and answer_key.tannin is not None and evaluation.tannin == answer_key.tannin:
             score += 5
 
         if evaluation.alcohol == answer_key.alcohol:
@@ -53,13 +54,13 @@ class ScoreService:
         if evaluation.flavors != None:
             score += 1
 
-        if evaluation.grape == answer_key.grape:
+        if evaluation.grape is not None and evaluation.grape == answer_key.grape:
             score += 5
-        
-        if evaluation.country == answer_key.country:
+
+        if evaluation.country is not None and evaluation.country == answer_key.country:
             score += 5
-        
-        if evaluation.vintage == answer_key.vintage:
+
+        if evaluation.vintage is not None and evaluation.vintage == answer_key.vintage:
             score += 5
 
         return score
