@@ -8,6 +8,7 @@ import Rounds from "./pages/Rounds";
 import ParticipantResult from "./pages/ParticipantResult";
 import { apiGet } from "./api/client";
 import "./styles/ui.css";
+import type { EvaluationResultResponse } from "./types/results";
 
 type UserType = "sommelier" | "participant" | null;
 
@@ -25,6 +26,10 @@ export default function App() {
   const hamburgerRef = useRef<HTMLButtonElement | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [roundIds, setRoundIds] = useState<string[]>([]);
+  const [participantResults, setParticipantResults] = useState<EvaluationResultResponse[]>([]);
+  const [loadingResult, setLoadingResult] = useState(false);
+  const [resultError, setResultError] = useState("");
+
 
   /* =========================
    * SOMMELIER STATE
@@ -70,6 +75,34 @@ export default function App() {
 
     loadEventStatus();
   }, [user]);
+
+  async function loadParticipantResults() {
+    if (roundIds.length === 0) {
+      setResultError("Nenhum round encontrado para este evento.");
+      return;
+    }
+    setLoadingResult(true);
+    setResultError("");
+
+    try {
+      const responses = await Promise.all(
+        roundIds.map(roundId =>
+          apiGet<EvaluationResultResponse>(
+            `/results/my-evaluation?round_id=${roundId}`
+          )
+        )
+      );
+
+      setParticipantResults(responses);
+      setShowResult(true);
+    } catch (err: any) {
+      setResultError(err?.message || "Erro ao carregar resultados.");
+    } finally {
+      setLoadingResult(false);
+    }
+  }
+
+
 
   /* ============================================================
    * SOMMELIER → eventos abertos para gabarito
@@ -363,7 +396,7 @@ export default function App() {
             )}
   
             {/* Evento finalizado → Ranking + Winner + botão Ver Resultado */}
-            {eventIsOpen === false && !showResult && (
+            {eventIsOpen === false && roundIds.length > 0 && !showResult && (
               <>
                 <div className="card stack">
                   <Winner eventId={user.info.event_id} />
@@ -379,7 +412,7 @@ export default function App() {
                 <div className="stack" style={{ marginTop: "1rem" }}>
                   <button
                     className="btn btn-primary"
-                    onClick={() => setShowResult(true)}
+                    onClick={loadParticipantResults}
                   >
                     Ver Resultado
                   </button>
@@ -387,16 +420,22 @@ export default function App() {
               </>
             )}
 
-            {/* Tela de Resultado do Participante */}
-            {showResult && (
-              <ParticipantResult
-                roundIds={roundIds}
-                onBack={() => setShowResult(false)}
-              />
+            {loadingResult && (
+              <div className="alert alert-info">
+                Carregando resultados...
+              </div>
             )}
 
 
-
+            {/* Tela de Resultado do Participante */}
+            {showResult && participantResults.length > 0 && (
+              <ParticipantResult
+                results={participantResults}
+                onBack={() => {setShowResult(false);
+                  setParticipantResults([]);
+                }}
+              />
+            )}
           </div>
         </main>
       </div>
