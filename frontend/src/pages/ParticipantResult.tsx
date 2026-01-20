@@ -23,7 +23,7 @@ export default function ParticipantResult({
         </button>
       </div>
 
-      {results.map((round, index) => {
+      {results.map((round) => {
         const allItems = round.blocks.flatMap((b) => b.items);
         const correct = allItems.filter((i) => i.status === "correct").length;
         const partial = allItems.filter((i) => i.status === "partial").length;
@@ -41,7 +41,7 @@ export default function ParticipantResult({
               }
             >
               <div>
-                <h3>Round {index + 1}</h3>
+                <h3>{round.round_name}</h3>
                 <div className="round-stats">
                   <span className="stat correct">🟢 {correct}</span>
                   <span className="stat partial">🟡 {partial}</span>

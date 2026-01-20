@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 from app.models.evaluation import Evaluation
+from app.models.round import Round
 from app.enums.scale_type import resolve_scale_label, ATTRIBUTE_SCALE
 from app.core.database import get_db
 from fastapi import HTTPException
@@ -203,6 +204,9 @@ def build_participant_result(
                 detail="Resultado ainda não disponível para este round."
             )
 
+        # Buscar o nome do round
+        round_obj = db.query(Round).filter(Round.id == round_id).first()
+        round_name = round_obj.name if round_obj else f"Round {round_id}"
 
         blocks = []
 
@@ -231,6 +235,7 @@ def build_participant_result(
 
         return {
             "round_id": round_id,
+            "round_name": round_name,
             "blocks": blocks,
         }
 

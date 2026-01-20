@@ -15,4 +15,5 @@ class ResultBlock(BaseModel):
 
 class EvaluationResultResponse(BaseModel):
     round_id: str
+    round_name: str
     blocks: List[ResultBlock]

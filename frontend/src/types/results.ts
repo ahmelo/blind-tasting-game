@@ -16,5 +16,6 @@ export interface ResultBlock {
 
 export interface EvaluationResultResponse {
   round_id: string;
+  round_name: string;
   blocks: ResultBlock[];
 }
