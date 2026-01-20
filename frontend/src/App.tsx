@@ -426,6 +426,12 @@ export default function App() {
               </div>
             )}
 
+            {resultError && (
+              <div className="alert alert-error">
+                {resultError}
+              </div>
+            )}
+
 
             {/* Tela de Resultado do Participante */}
             {showResult && participantResults.length > 0 && (

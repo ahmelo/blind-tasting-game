@@ -4,10 +4,50 @@ from app.enums.scale_type import resolve_scale_label, ATTRIBUTE_SCALE
 from app.core.database import get_db
 from fastapi import HTTPException
 
-# -----------------------------
-# Definição dos blocos e campos
-# -----------------------------
+# Dicionário de traduções para valores de enums
+ENUM_LABELS = {
+    "limpidity": {
+        "limpido": "Límpido",
+        "turvo": "Turvo",
+    },
+    "color_type": {
+        "branco": "Branco",
+        "rose": "Rosé",
+        "tinto": "Tinto",
+    },
+    "color_tone": {
+        "esverdeado": "Esverdeado",
+        "palha": "Palha",
+        "dourado": "Dourado",
+        "ambar": "Âmbar",
+        "salmao": "Salmão",
+        "alaranjado": "Alaranjado",
+        "cor_de_rosa": "Cor-de-rosa",
+        "avermelhado": "Avermelhado",
+        "purpura": "Púrpura",
+        "rubi": "Rubi",
+        "granada": "Granada",
+        "acastanhado": "Acastanhado",
+    },
+    "condition": {
+        "correto": "Correto",
+        "defeituoso": "Defeituoso",
+    },
+    "sweetness": {
+        "seco": "Seco",
+        "demi-sec": "Demi-Sec",
+        "doce": "Doce",
+    },
+    "quality": {
+        "pobre": "Pobre",
+        "aceitável": "Aceitável",
+        "boa": "Boa",
+        "muito boa": "Muito Boa",
+        "excelente": "Excelente",
+    },
+}
 
+# Definição dos blocos e campos
 BLOCKS = [
     {
         "key": "visual",
@@ -54,10 +94,6 @@ BLOCKS = [
 ]
 
 
-# -----------------------------
-# Funções auxiliares
-# -----------------------------
-
 def _format_value(attribute: str, value):
     """
     Converte o valor bruto do banco para o que será exibido no resultado.
@@ -69,8 +105,19 @@ def _format_value(attribute: str, value):
     if attribute in ATTRIBUTE_SCALE and isinstance(value, int):
         return resolve_scale_label(attribute, value)
 
-    # Caso seja enum ou string
-    return str(value).replace("_", " ").title()
+    # Caso seja enum, extrai o valor antes de formatar
+    if hasattr(value, 'value'):
+        value = value.value
+    
+    value_str = str(value)
+    
+    # Verifica se há tradução específica para este atributo
+    if attribute in ENUM_LABELS:
+        return ENUM_LABELS[attribute].get(value_str, value_str)
+    
+    # Caso contrário, formata o valor
+    formatted = value_str.replace("_", " ").replace("-", " ")
+    return " ".join(word.capitalize() for word in formatted.split())
 
 
 def _build_item(attribute, label, participant_eval, answer_key_eval):
@@ -112,11 +159,6 @@ def _build_item(attribute, label, participant_eval, answer_key_eval):
         "status": status,
     }
 
-
-
-# -----------------------------
-# Service principal
-# -----------------------------
 
 def build_participant_result(
     participant_id: str,
