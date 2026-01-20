@@ -28,6 +28,7 @@ export default function App() {
   const [roundIds, setRoundIds] = useState<string[]>([]);
   const [participantResults, setParticipantResults] = useState<EvaluationResultResponse[]>([]);
   const [loadingResult, setLoadingResult] = useState(false);
+  const [resultError, setResultError] = useState("");
 
 
   /* =========================
