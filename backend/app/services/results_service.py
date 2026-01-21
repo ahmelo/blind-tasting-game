@@ -242,3 +242,36 @@ def build_participant_result(
     finally:
         if close_db:
             db.close()
+
+def get_my_results(
+    db: Session,
+    participant_id: str,
+):
+    # Descobrir os rounds que o participante respondeu
+    round_ids = (
+        db.query(Evaluation.round_id)
+        .filter(
+            Evaluation.participant_id == participant_id,
+            Evaluation.is_answer_key == False,
+        )
+        .distinct()
+        .all()
+    )
+
+    if not round_ids:
+        raise HTTPException(
+            status_code=404,
+            detail="Nenhum resultado encontrado para este participante."
+        )
+
+    results = []
+
+    for (round_id,) in round_ids:
+        result = build_participant_result(
+            participant_id=participant_id,
+            round_id=round_id,
+            db=db,
+        )
+        results.append(result)
+
+    return results
