@@ -1,7 +1,6 @@
 const API_BASE = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api/v1";
 
 export async function apiPost<TReq, TRes>(path: string, body: TReq): Promise<TRes> {
-  console.log("PAYLOAD ENVIADO >>>", body);
   const res = await fetch(`${API_BASE}${path}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -76,5 +75,42 @@ export async function apiDelete(path: string): Promise<void> {
   }
 }
 
-console.log("API BASE:", import.meta.env.VITE_API_BASE);
+export async function apiDownload(
+  path: string,
+  filename: string
+): Promise<void> {
+  const participantId = getParticipantId();
 
+  const res = await fetch(`${API_BASE}${path}`, {
+    method: "GET",
+    headers: {
+      ...(participantId
+        ? { "X-Participant-Id": participantId }
+        : {}),
+      Accept: "application/pdf",
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error(await res.text());
+  }
+
+  const blob = await res.blob();
+
+  // segurança extra: valida se é PDF mesmo
+  if (blob.type !== "application/pdf") {
+    throw new Error("Resposta não é um PDF válido");
+  }
+
+  const url = window.URL.createObjectURL(blob);
+
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+
+  document.body.appendChild(link);
+  link.click();
+
+  link.remove();
+  window.URL.revokeObjectURL(url);
+}

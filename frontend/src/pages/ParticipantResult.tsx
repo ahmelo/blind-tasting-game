@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { EvaluationResultResponse } from "../types/results";
+import { apiDownload } from "../api/client";
 import "../styles/participant_result.css";
 
 interface ParticipantResultProps {
@@ -14,6 +15,19 @@ export default function ParticipantResult({
   const [openRound, setOpenRound] = useState<string | null>(null);
   const [openBlock, setOpenBlock] = useState<string | null>(null);
 
+  const handleDownloadPdf = async () => {
+    try {
+      await apiDownload(
+        "/results/pdf",
+        "resultado-avaliacao.pdf"
+      );
+    } catch (err) {
+      console.error(err);
+      alert("Não foi possível gerar o PDF");
+    }
+  };
+
+
   return (
     <div className="participant-result full-width">
       <div className="result-header">
@@ -22,6 +36,7 @@ export default function ParticipantResult({
           Voltar
         </button>
       </div>
+
 
       {results.map((round) => {
         const allItems = round.blocks.flatMap((b) => b.items);
@@ -130,8 +145,19 @@ export default function ParticipantResult({
               </div>
             )}
           </div>
+
         );
       })}
+
+      <div className="stack" style={{ marginTop: "1rem" }}>
+        <button
+          onClick={handleDownloadPdf}
+          className="btn btn-primary"
+        >
+          📄 Baixar resultado em PDF
+        </button>
+      </div>
+      
     </div>
   );
 }
