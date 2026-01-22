@@ -98,7 +98,7 @@ export default function ParticipantResult({
                                 <th>Status</th>
                                 <th>Item</th>
                                 <th>Você</th>
-                                <th>Gabarito</th>
+                                <th>Sommelier</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -130,7 +130,7 @@ export default function ParticipantResult({
                                 </div>
 
                                 <div className="mobile-item-row">
-                                    <span>Gabarito</span>
+                                    <span>Sommelier</span>
                                     <strong>{item.answer_key}</strong>
                                 </div>
                                 </div>
