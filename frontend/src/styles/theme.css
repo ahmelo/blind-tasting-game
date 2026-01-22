@@ -6,12 +6,18 @@
   padding: 0;
 }
 
-html, body, #root{
+html, body{
   width:100%;
   max-width:100%;
   overflow-x:hidden;
-  height:100%;
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+
+#root{
+  width:100%;
+  max-width:100%;
+  display: flex;
+  flex-direction: column;
 }
 
 :root {
@@ -20,3 +26,4 @@ html, body, #root{
   --wine-light: #a63a3a;
   --text-light: #ffffff;
 }
+

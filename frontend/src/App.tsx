@@ -24,6 +24,7 @@ export default function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
   const hamburgerRef = useRef<HTMLButtonElement | null>(null);
+  const mainRef = useRef<HTMLDivElement | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [roundIds, setRoundIds] = useState<string[]>([]);
   const [participantResults, setParticipantResults] = useState<EvaluationResultResponse[]>([]);
@@ -209,7 +210,7 @@ export default function App() {
           )}
         </header>
 
-        <main className="content">
+        <main className="content" ref={mainRef}>
           <div className="container">
 
             {/* ================= MENU ================= */}
@@ -291,6 +292,7 @@ export default function App() {
                     eventId={selectedEventId}
                     initialIsAnswerKey={true}
                     onEventClosed={() => setEventIsOpen(false)}
+                    scrollableRef={mainRef}
                   />
                 )}
               </div>
@@ -383,7 +385,7 @@ export default function App() {
           )}
         </header>
 
-        <main className="content">
+        <main className="content" ref={mainRef}>
           <div className="container stack">
 
             {eventIsOpen && (
@@ -392,6 +394,7 @@ export default function App() {
                 eventId={user.info.event_id}
                 initialIsAnswerKey={false}
                 onEventClosed={() => setEventIsOpen(false)}
+                scrollableRef={mainRef}
               />
             )}
   

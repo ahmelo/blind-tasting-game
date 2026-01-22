@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import { apiPost, apiGet } from "../api/client";
 import type {
   ColorType,
@@ -178,9 +178,29 @@ interface Evaluation {
   eventId: string;
   initialIsAnswerKey: boolean;
   onEventClosed: () => void;
+  scrollableRef?: React.RefObject<HTMLDivElement | null>;
 }
 
-export default function Evaluation({ participantId, eventId, initialIsAnswerKey, onEventClosed }: Evaluation) {
+function scrollToTop(scrollableRef?: React.RefObject<HTMLDivElement | null>) {
+  try {
+    if (scrollableRef?.current) {
+      scrollableRef.current.scrollTop = 0;
+      scrollableRef.current.scrollLeft = 0;
+    } else {
+      // Se não tem ref, tenta o window
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    }
+  } catch (e) {
+    console.error("Erro ao fazer scroll:", e);
+  }
+}
+
+
+export default function Evaluation({ participantId, eventId, initialIsAnswerKey, onEventClosed, scrollableRef }: Evaluation) {
+
+  const formRef = useRef<HTMLFormElement>(null);
 
   const [isAnswerKey, setIsAnswerKey] = useState<boolean>(initialIsAnswerKey);
 
@@ -268,8 +288,6 @@ export default function Evaluation({ participantId, eventId, initialIsAnswerKey,
       grape
     );
   }
-
-
   useEffect(() => {
     loadPendingRound();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -279,10 +297,24 @@ export default function Evaluation({ participantId, eventId, initialIsAnswerKey,
     if (roundId) {
       resetForm();
       setCanCloseRound(false);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      // Scroll para o topo após o novo round ser carregado
+      requestAnimationFrame(() => {
+        scrollToTop(scrollableRef);
+        // Tenta fazer scroll no formulário também
+        if (formRef.current) {
+          formRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        // Segunda chamada para garantir
+        setTimeout(() => {
+          scrollToTop(scrollableRef);
+          if (formRef.current) {
+            formRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }, 50);
+      });
     }
     setIsAnswerKey(initialIsAnswerKey);
-  }, [roundId]);
+  }, [roundId, scrollableRef]);
 
   useEffect(() => {
     if (!waiting || !onEventClosed) return;
@@ -331,6 +363,7 @@ export default function Evaluation({ participantId, eventId, initialIsAnswerKey,
         setRoundId(null);
         setRoundName(null);
         setWaiting(true);
+        scrollToTop();
       }
     } catch {
       setWaiting(true);
@@ -350,7 +383,6 @@ export default function Evaluation({ participantId, eventId, initialIsAnswerKey,
       await apiPost(`/rounds/${roundId}/close`, {});
       setCanCloseRound(false);
       await loadPendingRound(); // vai buscar o próximo round aberto
-      //     window.scrollTo({ top: 0, behavior: "smooth" });
     } catch {
       setError("Erro ao fechar a rodada.");
     } finally {
@@ -386,6 +418,7 @@ export default function Evaluation({ participantId, eventId, initialIsAnswerKey,
     }
 
     setLoading(true);
+    scrollToTop(scrollableRef);
 
     try {
       const payload: EvaluationCreate = {
@@ -423,7 +456,6 @@ export default function Evaluation({ participantId, eventId, initialIsAnswerKey,
       } else {
         await new Promise((r) => setTimeout(r, 800));
         await loadPendingRound();
-        //      window.scrollTo({ top: 0, behavior: "smooth" });
       }
 
     } catch {
@@ -464,8 +496,14 @@ export default function Evaluation({ participantId, eventId, initialIsAnswerKey,
 
 
   return (
-    <form onSubmit={onSubmit} className="evaluation">
+    <form onSubmit={onSubmit} className="evaluation" ref={formRef}>
       <h4>{roundName}</h4>
+
+      {loading && (
+        <div className="loading-overlay">
+          <p>Enviando avaliação...</p>
+        </div>
+      )}
 
       {error && <div className="alert alert-error">{error}</div>}
 

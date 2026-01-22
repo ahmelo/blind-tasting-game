@@ -9,12 +9,15 @@
 }
 
 .app-shell {
+  display: flex;
+  flex-direction: column;
   min-height: 100vh;
   background: var(--bg-app);
   color: var(--text)
 }
 
 .content {
+  flex: 1;
   padding: 24px 16px
 }
 
