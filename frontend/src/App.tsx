@@ -60,10 +60,12 @@ export default function App() {
         const ev = events.find(
           (e) => e.id === participant.info.event_id
         );
-        setEventIsOpen(ev ? ev.is_open : false);
+        
+        const isClosed = ev ? !ev.is_open : true;
+        setEventIsOpen(!isClosed);
 
         // Quando evento fecha, busca todos os rounds do evento
-        if (ev && !ev.is_open) {
+        if (ev && !ev.is_open && roundIds.length === 0) {
           const rounds = await apiGet<any[]>(
             `/rounds?event_id=${participant.info.event_id}`
           );
@@ -75,7 +77,17 @@ export default function App() {
     }
 
     loadEventStatus();
-  }, [user]);
+    
+    // Para o polling se o evento já está fechado e roundIds já foram carregados
+    if (eventIsOpen === false && roundIds.length > 0) {
+      return;
+    }
+    
+    // Faz polling a cada 3 segundos para verificar se o evento foi fechado
+    const interval = setInterval(loadEventStatus, 3000);
+    
+    return () => clearInterval(interval);
+  }, [user, roundIds.length, eventIsOpen]);
 
   async function loadParticipantResults() {
     if (roundIds.length === 0) {

@@ -21,11 +21,11 @@ export async function apiPost<TReq, TRes>(path: string, body: TReq): Promise<TRe
 }
 
 export function setParticipantSession(participantId: string) {
-  localStorage.setItem("participant_id", participantId);
+  sessionStorage.setItem("participant_id", participantId);
 }
 
 function getParticipantId() {
-  return localStorage.getItem("participant_id");
+  return sessionStorage.getItem("participant_id");
 }
 
 export async function apiGet<TRes>(path: string): Promise<TRes> {
