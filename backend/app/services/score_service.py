@@ -2,20 +2,22 @@ from app.models.evaluation import Evaluation
 from sqlalchemy.orm import Session
 from app.enums.score import Score
 
+
 class ScoreService:
 
     @staticmethod
     def compare_list_attribute(
-        participant_value: str | None,
-        answer_key_value: str | None
+        participant_value: str | None, answer_key_value: str | None
     ) -> str:
         participant_set = (
             set(a.strip().lower() for a in participant_value.split(","))
-            if participant_value else set()
+            if participant_value
+            else set()
         )
         answer_key_set = (
             set(a.strip().lower() for a in answer_key_value.split(","))
-            if answer_key_value else set()
+            if answer_key_value
+            else set()
         )
 
         matches = participant_set & answer_key_set
@@ -28,17 +30,14 @@ class ScoreService:
             return "partial"
 
     @staticmethod
-    def calculate_score(
-        evaluation: Evaluation,
-        answer_key: Evaluation
-    ) -> int:
+    def calculate_score(evaluation: Evaluation, answer_key: Evaluation) -> int:
         score = 0
 
         if evaluation.limpidity == answer_key.limpidity:
             score += Score.normal.value
 
         if evaluation.visualIntensity == answer_key.visualIntensity:
-            score += Score.normal.value 
+            score += Score.normal.value
 
         if evaluation.color_type == answer_key.color_type:
             score += Score.normal.value
@@ -54,19 +53,22 @@ class ScoreService:
 
         if evaluation.aromas is not None and answer_key.aromas is not None:
             status = ScoreService.compare_list_attribute(
-                evaluation.aromas,
-                answer_key.aromas
+                evaluation.aromas, answer_key.aromas
             )
             if status == "correct":
                 score += Score.extra.value
             elif status == "partial":
                 score += Score.normal.value
-        
+
         if evaluation.sweetness == answer_key.sweetness:
             score += Score.normal.value
 
         # Tannin só é comparado se ambos têm valor (não é branco)
-        if evaluation.tannin is not None and answer_key.tannin is not None and evaluation.tannin == answer_key.tannin:
+        if (
+            evaluation.tannin is not None
+            and answer_key.tannin is not None
+            and evaluation.tannin == answer_key.tannin
+        ):
             score += Score.normal.value
 
         if evaluation.alcohol == answer_key.alcohol:
@@ -82,8 +84,7 @@ class ScoreService:
             score += Score.normal.value
         if evaluation.flavors is not None and answer_key.flavors is not None:
             status = ScoreService.compare_list_attribute(
-                evaluation.flavors,
-                answer_key.flavors
+                evaluation.flavors, answer_key.flavors
             )
             if status == "correct":
                 score += Score.extra.value
@@ -121,19 +122,13 @@ class ScoreService:
         evaluations = (
             db.query(Evaluation)
             .filter(
-                Evaluation.round_id == round_id,
-                Evaluation.is_answer_key.is_(False)
+                Evaluation.round_id == round_id, Evaluation.is_answer_key.is_(False)
             )
             .all()
         )
 
         for evaluation in evaluations:
-            evaluation.score = ScoreService.calculate_score(
-                evaluation,
-                answer_key
-            )
+            evaluation.score = ScoreService.calculate_score(evaluation, answer_key)
 
         db.commit()
         return len(evaluations)
-    
-
