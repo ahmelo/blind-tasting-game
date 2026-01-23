@@ -45,6 +45,17 @@
   gap: 12px
 }
 
+.brand-logo {
+  height: 120px;
+  /* ajuste conforme o logo */
+  width: auto;
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+}
+
 .brand-dot {
   width: 12px;
   height: 12px;

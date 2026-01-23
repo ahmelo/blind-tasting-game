@@ -195,8 +195,12 @@ export default function App() {
       <div className="app-shell">
         <header className="topbar">
           <div className="topbar-left">
-            <div className="brand-dot" />
-            <div>
+            <img
+              src="/logo_app.png"
+              alt="Logo"
+              className="brand-logo"
+            />
+            <div className="brand-text">
               <div className="topbar-title">Savoir-Vin</div>
               <div className="topbar-subtitle">Painel do Sommelier</div>
             </div>
@@ -362,8 +366,12 @@ export default function App() {
       <div className="app-shell">
         <header className="topbar">
           <div className="topbar-left">
-            <div className="brand-dot" />
-            <div>
+            <img
+              src="/logo_app.png"
+              alt="Logo"
+              className="brand-logo"
+            />
+            <div className="brand-text">
               <div className="topbar-title">Degustação às Cegas</div>
               <div className="topbar-subtitle">
                 Bem-vindo(a), {user.info.name}

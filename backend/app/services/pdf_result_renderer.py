@@ -1,12 +1,20 @@
 from datetime import datetime
 from typing import List
 from app.schemas.results import EvaluationResultResponse
+import base64
+from pathlib import Path
 
 
 class ResultPdfRenderer:
 
     @staticmethod
     def render(participant_name: str, results: list[dict]) -> str:
+
+        BASE_DIR = Path(__file__).resolve().parent.parent
+        logo_path = BASE_DIR / "assets" / "logo_app.png"
+
+        with open(logo_path, "rb") as f:
+            logo_base64 = base64.b64encode(f.read()).decode("utf-8")
         rounds_html = ""
 
         for r in results:
@@ -51,20 +59,52 @@ class ResultPdfRenderer:
         <html>
         <head>
             <style>
-            body {{ font-family: Arial, sans-serif; }}
-            h1 {{ margin-bottom: 0; }}
-            h2 {{ margin-top: 30px; }}
-            table {{ width: 100%; border-collapse: collapse; margin-bottom: 20px; }}
-            th, td {{ border: 1px solid #ddd; padding: 6px; font-size: 12px; }}
-            tr.correct {{ background: #e8f5e9; }}
-            tr.partial {{ background: #fffde7; }}
-            tr.wrong {{ background: #ffebee; }}
+                body {{ font-family: Arial, sans-serif; }}
+
+                .header {{
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    margin-bottom: 8px;
+                }}
+
+                .header img {{
+                    height: 120px; /* ajuste conforme seu logo */
+                }}
+
+                .header-text p {{
+                    margin: 4px 0 0 0;
+                    font-size: 14px;
+                }}
+
+                .header-logo img {{
+                    height: 240px;
+                    margin-left: auto
+                }}
+
+                h1 {{ margin-bottom: 0; }}
+                h2 {{ margin-top: 30px; }}
+                table {{ width: 100%; border-collapse: collapse; margin-bottom: 20px; }}
+                th, td {{ border: 1px solid #ddd; padding: 6px; font-size: 12px; }}
+                tr.correct {{ background: #e8f5e9; }}
+                tr.partial {{ background: #fffde7; }}
+                tr.wrong {{ background: #ffebee; }}
             </style>
         </head>
         <body>
-            <h1>{r['event_name']}</h1>
-            <p>Participante: <strong>{participant_name}</strong></p>
-            {rounds_html}
+        <div class="header">
+            
+            <div class="header-logo">
+                <img src="data:image/png;base64,{logo_base64}" alt="Logo">
+            </div>    
+        
+            <div class="header-text">
+                <h1>{r['event_name']}</h1>
+                <h3>Participante: <strong>{participant_name}</strong></h3>
+            </div>
+        </div>
+
+        {rounds_html}
         </body>
         </html>
         """
