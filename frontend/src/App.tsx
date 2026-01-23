@@ -1,12 +1,12 @@
-import { useState, useEffect, useRef } from "react";
-import Login from "./pages/Login";
-import Evaluation from "./pages/Evaluation";
-import Ranking from "./pages/Ranking";
-import Winner from "./pages/Winner";
-import Events from "./pages/Events";
-import Rounds from "./pages/Rounds";
-import ParticipantResult from "./pages/ParticipantResult";
+import { useEffect, useRef, useState } from "react";
 import { apiGet } from "./api/client";
+import Evaluation from "./pages/Evaluation";
+import Events from "./pages/Events";
+import Login from "./pages/Login";
+import ParticipantResult from "./pages/ParticipantResult";
+import Ranking from "./pages/Ranking";
+import Rounds from "./pages/Rounds";
+import Winner from "./pages/Winner";
 import "./styles/ui.css";
 import type { EvaluationResultResponse } from "./types/results";
 
@@ -60,7 +60,7 @@ export default function App() {
         const ev = events.find(
           (e) => e.id === participant.info.event_id
         );
-        
+
         const isClosed = ev ? !ev.is_open : true;
         setEventIsOpen(!isClosed);
 
@@ -77,15 +77,15 @@ export default function App() {
     }
 
     loadEventStatus();
-    
+
     // Para o polling se o evento já está fechado e roundIds já foram carregados
     if (eventIsOpen === false && roundIds.length > 0) {
       return;
     }
-    
+
     // Faz polling a cada 3 segundos para verificar se o evento foi fechado
     const interval = setInterval(loadEventStatus, 3000);
-    
+
     return () => clearInterval(interval);
   }, [user, roundIds.length, eventIsOpen]);
 
@@ -114,6 +114,24 @@ export default function App() {
       setLoadingResult(false);
     }
   }
+  function handleLogout() {
+    setMenuOpen(false);
+    setUser(null);
+
+    // PARTICIPANTE
+    setEventIsOpen(null);
+    setRoundIds([]);
+    setShowResult(false);
+    setParticipantResults([]);
+    setLoadingResult(false);
+    setResultError("");
+
+    // SOMMELIER
+    setSommelierView("menu");
+    setSelectedEventId(null);
+    setGabaritoEvents([]);
+  }
+
 
 
 
@@ -188,10 +206,7 @@ export default function App() {
             {/* Desktop */}
             <button
               className="btn btn-outline btn-logout-desktop"
-              onClick={() => {
-                setMenuOpen(false);
-                setUser(null);
-              }}
+              onClick={handleLogout}
             >
               Sair
             </button>
@@ -210,11 +225,8 @@ export default function App() {
           {menuOpen && (
             <div ref={menuRef} className="mobile-menu">
               <button
-                className="mobile-menu-item"
-                onClick={() => {
-                  setMenuOpen(false);
-                  setUser(null);
-                }}
+                className="btn btn-outline btn-logout-desktop"
+                onClick={handleLogout}
               >
                 Sair
               </button>
@@ -345,7 +357,7 @@ export default function App() {
    * PARTICIPANTE
    * ============================================================ */
   if (user.type === "participant") {
-    
+
     return (
       <div className="app-shell">
         <header className="topbar">
@@ -363,10 +375,7 @@ export default function App() {
             {/* Desktop */}
             <button
               className="btn btn-outline btn-logout-desktop"
-              onClick={() => {
-                setMenuOpen(false);
-                setUser(null);
-              }}
+              onClick={handleLogout}
             >
               Sair
             </button>
@@ -385,11 +394,8 @@ export default function App() {
           {menuOpen && (
             <div ref={menuRef} className="mobile-menu">
               <button
-                className="mobile-menu-item"
-                onClick={() => {
-                  setMenuOpen(false);
-                  setUser(null);
-                }}
+                className="btn btn-outline btn-logout-desktop"
+                onClick={handleLogout}
               >
                 Sair
               </button>
@@ -409,19 +415,19 @@ export default function App() {
                 scrollableRef={mainRef}
               />
             )}
-  
+
             {/* Evento finalizado → Ranking + Winner + botão Ver Resultado */}
             {eventIsOpen === false && roundIds.length > 0 && !showResult && (
               <>
                 <div className="card stack">
-                  <Winner eventId={user.info.event_id} />
+                  <Winner eventId={user.info.event_id} key={user.info.event_id} />
                 </div>
 
                 <div className="card stack">
                   <div className="card-header">
                     <h2 className="h2">Ranking</h2>
                   </div>
-                  <Ranking eventId={user.info.event_id} />
+                  <Ranking eventId={user.info.event_id} key={user.info.event_id} />
                 </div>
 
                 <div className="stack" style={{ marginTop: "1rem" }}>
@@ -452,7 +458,8 @@ export default function App() {
             {showResult && participantResults.length > 0 && (
               <ParticipantResult
                 results={participantResults}
-                onBack={() => {setShowResult(false);
+                onBack={() => {
+                  setShowResult(false);
                   setParticipantResults([]);
                 }}
               />
