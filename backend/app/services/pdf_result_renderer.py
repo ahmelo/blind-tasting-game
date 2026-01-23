@@ -6,7 +6,7 @@ from app.schemas.results import EvaluationResultResponse
 class ResultPdfRenderer:
 
     @staticmethod
-    def render(participant_name: str, event_name: str, results: list[dict]) -> str:
+    def render(participant_name: str, results: list[dict]) -> str:
         rounds_html = ""
 
         for r in results:
@@ -62,10 +62,9 @@ class ResultPdfRenderer:
             </style>
         </head>
         <body>
-            <h1>{event_name}</h1>
+            <h1>{r['event_name']}</h1>
             <p>Participante: <strong>{participant_name}</strong></p>
             {rounds_html}
         </body>
         </html>
         """
-

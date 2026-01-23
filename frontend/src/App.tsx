@@ -225,7 +225,7 @@ export default function App() {
           {menuOpen && (
             <div ref={menuRef} className="mobile-menu">
               <button
-                className="btn btn-outline btn-logout-desktop"
+                className="mobile-menu-item"
                 onClick={handleLogout}
               >
                 Sair
@@ -394,7 +394,7 @@ export default function App() {
           {menuOpen && (
             <div ref={menuRef} className="mobile-menu">
               <button
-                className="btn btn-outline btn-logout-desktop"
+                className="mobile-menu-item"
                 onClick={handleLogout}
               >
                 Sair

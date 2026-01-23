@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from app.models.evaluation import Evaluation
 from app.models.round import Round
+from app.models.event import Event
 from app.enums.scale_type import resolve_scale_label, ATTRIBUTE_SCALE
 from app.core.database import get_db
 from fastapi import HTTPException
@@ -107,15 +108,15 @@ def _format_value(attribute: str, value):
         return resolve_scale_label(attribute, value)
 
     # Caso seja enum, extrai o valor antes de formatar
-    if hasattr(value, 'value'):
+    if hasattr(value, "value"):
         value = value.value
-    
+
     value_str = str(value)
-    
+
     # Verifica se há tradução específica para este atributo
     if attribute in ENUM_LABELS:
         return ENUM_LABELS[attribute].get(value_str, value_str)
-    
+
     # Caso contrário, formata o valor
     formatted = value_str.replace("_", " ").replace("-", " ")
     return " ".join(word.capitalize() for word in formatted.split())
@@ -137,8 +138,16 @@ def _build_item(attribute, label, participant_eval, answer_key_eval):
     # Tratamento especial para aromas e sabores (parcial)
     if attribute in ["aromas", "flavors"]:
         # transforma em sets de strings normalizadas
-        participant_set = set(a.strip().lower() for a in participant_value.split(",")) if participant_value else set()
-        answer_key_set = set(a.strip().lower() for a in answer_key_value.split(",")) if answer_key_value else set()
+        participant_set = (
+            set(a.strip().lower() for a in participant_value.split(","))
+            if participant_value
+            else set()
+        )
+        answer_key_set = (
+            set(a.strip().lower() for a in answer_key_value.split(","))
+            if answer_key_value
+            else set()
+        )
 
         matches = participant_set & answer_key_set
 
@@ -194,19 +203,21 @@ def build_participant_result(
 
         if not participant_eval:
             raise HTTPException(
-                status_code=404,
-                detail="Participante não respondeu este round."
+                status_code=404, detail="Participante não respondeu este round."
             )
 
         if not answer_key_eval:
             raise HTTPException(
                 status_code=409,
-                detail="Resultado ainda não disponível para este round."
+                detail="Resultado ainda não disponível para este round.",
             )
 
         # Buscar o nome do round
         round_obj = db.query(Round).filter(Round.id == round_id).first()
         round_name = round_obj.name if round_obj else f"Round {round_id}"
+
+        event_obj = db.query(Event).filter(Event.id == round_obj.event_id).first()
+        event_name = event_obj.name if event_obj else f"Degustação às Cegas"
 
         blocks = []
 
@@ -227,21 +238,25 @@ def build_participant_result(
                     )
                 )
 
-            blocks.append({
-                "key": block["key"],
-                "label": block["label"],
-                "items": items,
-            })
+            blocks.append(
+                {
+                    "key": block["key"],
+                    "label": block["label"],
+                    "items": items,
+                }
+            )
 
         return {
             "round_id": round_id,
             "round_name": round_name,
+            "event_name": event_name,
             "blocks": blocks,
         }
 
     finally:
         if close_db:
             db.close()
+
 
 def get_my_results(
     db: Session,
@@ -261,7 +276,7 @@ def get_my_results(
     if not round_ids:
         raise HTTPException(
             status_code=404,
-            detail="Nenhum resultado encontrado para este participante."
+            detail="Nenhum resultado encontrado para este participante.",
         )
 
     results = []

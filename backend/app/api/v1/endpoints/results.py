@@ -13,35 +13,28 @@ from app.services.results_service import get_my_results
 
 router = APIRouter(prefix="/results", tags=["Results"])
 
+
 @router.get("/my-evaluation", response_model=EvaluationResultResponse)
 def my_evaluation_result(
     round_id: str = Query(...),
-    participant = Depends(get_current_participant),
+    participant=Depends(get_current_participant),
 ):
-    return build_participant_result(
-        participant_id=participant.id,
-        round_id=round_id
-    )
+    return build_participant_result(participant_id=participant.id, round_id=round_id)
+
 
 @router.get("/pdf")
 def export_my_result_pdf(
     db: Session = Depends(get_db),
-    participant = Depends(get_current_participant),
+    participant=Depends(get_current_participant),
 ):
     results = get_my_results(db, participant.id)
 
-    html = ResultPdfRenderer.render(
-        participant_name=participant.name,
-        event_name="Da Uva à Taça",
-        results=results
-    )
+    html = ResultPdfRenderer.render(participant_name=participant.name, results=results)
 
     pdf = PdfGenerator.from_html(html)
 
     return Response(
         pdf,
         media_type="application/pdf",
-        headers={
-            "Content-Disposition": "attachment; filename=resultado-avaliacao.pdf"
-        }
+        headers={"Content-Disposition": "attachment; filename=resultado-avaliacao.pdf"},
     )
