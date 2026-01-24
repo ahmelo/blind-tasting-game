@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { apiPost, setParticipantSession } from "../api/client";
+import { usePWAInstall } from "../hooks/usePWAInstall";
 import "../styles/login.css";
+
 
 type UserType = "sommelier" | "participant" | null;
 
@@ -14,6 +16,8 @@ export default function Login({
   const [password, setPassword] = useState("");
   const [eventCode, setEventCode] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const { canInstall, install } = usePWAInstall();
+
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -83,6 +87,13 @@ export default function Login({
             <button className="btn btn-primary" onClick={() => setUserType("participant")}>
               Sou Participante
             </button>
+
+            {canInstall && (
+              <button className="install-button" onClick={install}>
+                Instalar app
+              </button>
+            )}
+
           </div>
         ) : (
           <form className="login-form" onSubmit={handleSubmit}>

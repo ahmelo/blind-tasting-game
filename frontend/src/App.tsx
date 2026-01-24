@@ -10,6 +10,7 @@ import Winner from "./pages/Winner";
 import "./styles/ui.css";
 import type { EvaluationResultResponse } from "./types/results";
 
+
 type UserType = "sommelier" | "participant" | null;
 
 type SommelierView =

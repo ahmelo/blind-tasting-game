@@ -21,11 +21,10 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:5173",  # Vite
         "http://127.0.0.1:5173",
-        "http://localhost:4173",  
+        "http://localhost:4173",
         "http://127.0.0.1:4173",
         "https://blind-tasting-game.vercel.app",  # vamos ajustar depois
-        "https://degust.savoirvin.com.br"
-
+        "https://degust.savoirvin.com.br",
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -34,7 +33,7 @@ app.add_middleware(
 
 app.include_router(api_router, prefix="/api/v1")
 
+
 @app.on_event("startup")
 def startup_event():
     init_mvp()
-
