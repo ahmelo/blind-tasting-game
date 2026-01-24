@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { apiPost, setParticipantSession } from "../api/client";
+import { apiPost } from "../api/client";
 import { usePWAInstall } from "../hooks/usePWAInstall";
 import "../styles/login.css";
+import { storage } from "../utils/storage";
 
 
 type UserType = "sommelier" | "participant" | null;
@@ -40,14 +41,20 @@ export default function Login({
           );
           setError(null);
           onLogin("participant", data);
-          setParticipantSession(data.participant_id);
+          storage.setParticipantId(data.participant_id);
+          storage.setUserType("participant");
         } catch (err: any) {
           setError(err?.message || "Erro ao participar do evento");
         }
       }
-    } catch (err) {
-      console.error(err);
-      setError("Erro ao conectar com o servidor");
+    } catch (err: any) {
+      if (err.name === "NetworkError") {
+        setError(
+          "Servidor temporariamente indisponível. Tente novamente em instantes."
+        );
+      } else {
+        setError(err?.message || "Erro inesperado");
+      }
     }
   }
 
