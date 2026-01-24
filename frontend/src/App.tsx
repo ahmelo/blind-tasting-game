@@ -109,7 +109,7 @@ export default function App() {
       setParticipantResults(responses);
       setShowResult(true);
     } catch (err: any) {
-      setResultError(err?.message || "Erro ao carregar resultados.");
+      setResultError(err?.detail || "Erro ao carregar resultados.");
     } finally {
       setLoadingResult(false);
     }

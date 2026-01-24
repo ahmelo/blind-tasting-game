@@ -202,9 +202,7 @@ def build_participant_result(
         )
 
         if not participant_eval:
-            raise HTTPException(
-                status_code=404, detail="Participante não respondeu este round."
-            )
+            raise HTTPException(status_code=404, detail="Participante não respondeu.")
 
         if not answer_key_eval:
             raise HTTPException(

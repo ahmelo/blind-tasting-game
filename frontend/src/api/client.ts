@@ -38,7 +38,10 @@ export async function apiGet<TRes>(path: string): Promise<TRes> {
     },
   });
 
-  if (!res.ok) throw new Error(await res.text());
+  if (!res.ok) {
+    const error = await res.json();
+    throw error;
+  }
   return res.json() as Promise<TRes>;
 }
 
