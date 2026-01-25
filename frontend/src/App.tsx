@@ -320,7 +320,7 @@ export default function App() {
                     participantId={user.info.participant_id}
                     eventId={selectedEventId}
                     initialIsAnswerKey={true}
-                    onEventClosed={() => setEventIsOpen(false)}
+                    onEventClosed={() => { setSommelierView("event-result") }}
                     scrollableRef={mainRef}
                   />
                 )}

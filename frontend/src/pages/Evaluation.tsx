@@ -1,17 +1,17 @@
-import { useMemo, useState, useEffect, useRef } from "react";
-import { apiPost, apiGet } from "../api/client";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { apiGet, apiPost } from "../api/client";
+import "../styles/evaluation.css";
 import type {
   ColorType,
-  Limpidity,
   Condition,
-  Sweetness,
-  Quality,
-  Grape,
   Country,
   EvaluationCreate,
   EvaluationResponse,
+  Grape,
+  Limpidity,
+  Quality,
+  Sweetness,
 } from "../types/evaluations";
-import "../styles/evaluation.css";
 
 type RoundApiItem = {
   id: string;
@@ -96,7 +96,7 @@ const qualityOptions: { value: Quality; label: string }[] = [
   { value: "excelente", label: "Excelente" },
 ];
 
-const grapeOptions : Grape[] = [
+const grapeOptions: Grape[] = [
   "Airén",
   "Albariño",
   "Barbera",
@@ -398,7 +398,7 @@ export default function Evaluation({ participantId, eventId, initialIsAnswerKey,
 
     try {
       await apiPost(`/events/${eventId}/close`, {});
-      setWaiting(true); // evento acabou, não tem mais fluxo
+      onEventClosed();
     } catch {
       setError("Erro ao fechar o evento.");
     } finally {
