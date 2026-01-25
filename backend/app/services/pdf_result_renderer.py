@@ -82,7 +82,7 @@ class ResultPdfRenderer:
                 .header-text .total-score {{
                     font-weight: bold;
                     font-size: 18px;
-                    color: #1e40af;
+                    color: #555;
                 }}
                 h2 {{ margin-top: 30px; color: #1f2937; }}
                 h3 {{ margin-bottom: 8px; }}
