@@ -1,7 +1,7 @@
-import { useState } from "react";
-import type { EvaluationResultResponse } from "../types/results";
-import { apiDownload } from "../api/client";
+import { useEffect, useState } from "react";
+import { apiDownload, apiGet } from "../api/client";
 import "../styles/participant_result.css";
+import type { EvaluationResultResponse } from "../types/results";
 
 interface ParticipantResultProps {
   results: EvaluationResultResponse[];
@@ -15,21 +15,38 @@ export default function ParticipantResult({
   const [openRound, setOpenRound] = useState<string | null>(null);
   const [openBlock, setOpenBlock] = useState<string | null>(null);
 
+  const [totalScore, setTotalScore] = useState<number | null>(null);
+  const [loadingScore, setLoadingScore] = useState(false);
+
+  useEffect(() => {
+    async function loadScore() {
+      setLoadingScore(true);
+      try {
+        const res = await apiGet<{ total_score: number }>("/results/my-score");
+        setTotalScore(res.total_score);
+      } catch {
+        setTotalScore(null);
+      } finally {
+        setLoadingScore(false);
+      }
+    }
+
+    loadScore();
+  }, []);
+
   const handleDownloadPdf = async () => {
     try {
-      await apiDownload(
-        "/results/pdf",
-        "resultado-avaliacao.pdf"
-      );
+      await apiDownload("/results/pdf", "resultado-avaliacao.pdf");
     } catch (err) {
       console.error(err);
       alert("Não foi possível gerar o PDF");
     }
   };
 
-
   return (
     <div className="participant-result full-width">
+
+      {/* ===== HEADER ===== */}
       <div className="result-header">
         <h2>Resultado da Avaliação</h2>
         <button className="btn btn-ghost" onClick={onBack}>
@@ -37,7 +54,23 @@ export default function ParticipantResult({
         </button>
       </div>
 
+      {/* ===== SCORE SUMMARY ===== */}
+      <div className="card stack result-summary">
+        {loadingScore && (
+          <p className="muted">Calculando seu score...</p>
+        )}
 
+        {totalScore !== null && (
+          <div className="score-highlight">
+            <span className="score-label">Seu score total é</span>
+            <span className="score-value">{totalScore}</span>
+            <span className="score-label">pontos</span>
+          </div>
+        )}
+
+      </div>
+
+      {/* ===== ROUNDS ===== */}
       {results.map((round) => {
         const allItems = round.blocks.flatMap((b) => b.items);
         const correct = allItems.filter((i) => i.status === "correct").length;
@@ -48,7 +81,6 @@ export default function ParticipantResult({
 
         return (
           <div key={round.round_id} className="round-card">
-            {/* ===== ROUND HEADER ===== */}
             <div
               className="round-header"
               onClick={() =>
@@ -66,7 +98,6 @@ export default function ParticipantResult({
               <span className="round-toggle">{roundOpen ? "▲" : "▼"}</span>
             </div>
 
-            {/* ===== ROUND CONTENT ===== */}
             {roundOpen && (
               <div className="round-content">
                 {round.blocks.map((block) => {
@@ -75,7 +106,6 @@ export default function ParticipantResult({
 
                   return (
                     <div key={block.key} className="block-card">
-                      {/* BLOCK HEADER */}
                       <div
                         className="block-header"
                         onClick={() =>
@@ -88,67 +118,69 @@ export default function ParticipantResult({
                         </span>
                       </div>
 
-                      {/* BLOCK TABLE */}
                       {blockOpen && (
                         <div className="block-content">
-                            {/* ===== DESKTOP (tabela atual, sem mudanças) ===== */}
-                            <table className="result-table desktop-only">
+
+                          {/* DESKTOP */}
+                          <table className="result-table desktop-only">
                             <thead>
-                                <tr>
+                              <tr>
                                 <th>Status</th>
                                 <th>Item</th>
                                 <th>Você</th>
                                 <th>Sommelier</th>
-                                </tr>
+                              </tr>
                             </thead>
                             <tbody>
-                                {block.items.map(item => (
+                              {block.items.map((item) => (
                                 <tr key={item.key}>
-                                    <td>
+                                  <td>
                                     <span className={`dot ${item.status}`} />
-                                    </td>
-                                    <td>{item.label}</td>
-                                    <td>{item.participant}</td>
-                                    <td>{item.answer_key}</td>
+                                  </td>
+                                  <td>{item.label}</td>
+                                  <td>{item.participant}</td>
+                                  <td>{item.answer_key}</td>
                                 </tr>
-                                ))}
+                              ))}
                             </tbody>
-                            </table>
+                          </table>
 
-                            {/* ===== MOBILE (lista adaptada) ===== */}
-                            <div className="mobile-only">
-                            {block.items.map(item => (
-                                <div key={item.key} className="mobile-result-item">
+                          {/* MOBILE */}
+                          <div className="mobile-only">
+                            {block.items.map((item) => (
+                              <div key={item.key} className="mobile-result-item">
                                 <div className="mobile-item-header">
-                                    <span className={`dot ${item.status}`} />
-                                    <span className="mobile-item-label">{item.label}</span>
+                                  <span className={`dot ${item.status}`} />
+                                  <span className="mobile-item-label">
+                                    {item.label}
+                                  </span>
                                 </div>
 
                                 <div className="mobile-item-row">
-                                    <span>Você</span>
-                                    <strong>{item.participant}</strong>
+                                  <span>Você</span>
+                                  <strong>{item.participant}</strong>
                                 </div>
 
                                 <div className="mobile-item-row">
-                                    <span>Sommelier</span>
-                                    <strong>{item.answer_key}</strong>
+                                  <span>Sommelier</span>
+                                  <strong>{item.answer_key}</strong>
                                 </div>
-                                </div>
+                              </div>
                             ))}
-                            </div>
-                        </div>
-                        )}
+                          </div>
 
+                        </div>
+                      )}
                     </div>
                   );
                 })}
               </div>
             )}
           </div>
-
         );
       })}
 
+      {/* ===== PDF ===== */}
       <div className="stack" style={{ marginTop: "1rem" }}>
         <button
           onClick={handleDownloadPdf}
@@ -157,7 +189,7 @@ export default function ParticipantResult({
           📄 Baixar resultado em PDF
         </button>
       </div>
-      
+
     </div>
   );
 }

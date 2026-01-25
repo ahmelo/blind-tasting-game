@@ -8,7 +8,7 @@ from fastapi.responses import Response
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.dependencies import get_current_participant
-from app.services.results_service import get_my_results
+from app.services.results_service import get_my_results, get_my_total_score
 
 
 router = APIRouter(prefix="/results", tags=["Results"])
@@ -28,8 +28,11 @@ def export_my_result_pdf(
     participant=Depends(get_current_participant),
 ):
     results = get_my_results(db, participant.id)
+    total = my_total_score(db, participant)
 
-    html = ResultPdfRenderer.render(participant_name=participant.name, results=results)
+    html = ResultPdfRenderer.render(
+        participant_name=participant.name, results=results, total_score=total
+    )
 
     pdf = PdfGenerator.from_html(html)
 
@@ -38,3 +41,12 @@ def export_my_result_pdf(
         media_type="application/pdf",
         headers={"Content-Disposition": "attachment; filename=resultado-avaliacao.pdf"},
     )
+
+
+@router.get("/my-score")
+def my_total_score(
+    db: Session = Depends(get_db),
+    participant=Depends(get_current_participant),
+):
+    total = get_my_total_score(db, participant.id)
+    return {"total_score": total}

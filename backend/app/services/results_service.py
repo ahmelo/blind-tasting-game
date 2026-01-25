@@ -5,6 +5,8 @@ from app.models.event import Event
 from app.enums.scale_type import resolve_scale_label, ATTRIBUTE_SCALE
 from app.core.database import get_db
 from fastapi import HTTPException
+from app.services.score_service import ScoreService
+
 
 # Dicionário de traduções para valores de enums
 ENUM_LABELS = {
@@ -90,7 +92,7 @@ BLOCKS = [
             ("quality", "Qualidade"),
             ("grape", "Uva Principal"),
             ("country", "País"),
-            ("vintage", "Ano"),
+            ("vintage", "Safra"),
         ],
     },
 ]
@@ -288,3 +290,25 @@ def get_my_results(
         results.append(result)
 
     return results
+
+
+def get_my_total_score(db: Session, participant_id: str) -> int:
+    evaluations = (
+        db.query(Evaluation)
+        .filter(
+            Evaluation.participant_id == participant_id,
+            Evaluation.is_answer_key == False,
+        )
+        .all()
+    )
+
+    total = 0
+
+    for evaluation in evaluations:
+        answer_key = ScoreService.get_answer_key(db, evaluation.round_id)
+        if not answer_key:
+            continue
+
+        total += ScoreService.calculate_score(evaluation, answer_key)
+
+    return total

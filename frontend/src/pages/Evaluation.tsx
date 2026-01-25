@@ -859,14 +859,14 @@ export default function Evaluation({ participantId, eventId, initialIsAnswerKey,
           </div>
         </fieldset>
 
-        {/* Ano */}
+        {/* Safra */}
         <fieldset className="group" disabled={loadingRound || !roundId || canCloseRound}>
-          <legend className="group-title">Ano</legend>
+          <legend className="group-title">Safra</legend>
           <input
             type="number"
             name="vintage"
             className="input"
-            placeholder="Qual o ano de produção do vinho?"
+            placeholder="Qual a safra do vinho?"
             value={vintage?.valueOf() ?? ""}
             inputMode="numeric"
             pattern="[0-9]*"

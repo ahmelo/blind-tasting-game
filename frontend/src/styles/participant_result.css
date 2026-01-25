@@ -195,9 +195,17 @@
   display: inline-block;
 }
 
-.dot.correct { background: #22c55e; }
-.dot.partial { background: #facc15; }
-.dot.wrong { background: #ef4444; }
+.dot.correct {
+  background: #22c55e;
+}
+
+.dot.partial {
+  background: #facc15;
+}
+
+.dot.wrong {
+  background: #ef4444;
+}
 
 /* =========================
    MOBILE ADAPTAÇÃO
@@ -240,3 +248,34 @@
   }
 }
 
+/* ===== SCORE SUMMARY ===== */
+
+.result-summary {
+  text-align: center;
+}
+
+.score-highlight {
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin: 0.75rem 0;
+}
+
+.score-label {
+  font-size: 1.2rem;
+  color: #6b7280;
+}
+
+.score-value {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #2e7d32;
+}
+
+.muted {
+  font-size: 0.85rem;
+  color: #6b7280;
+  display: flex;
+  justify-content: center;
+}
