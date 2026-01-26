@@ -1,6 +1,9 @@
 from enum import Enum
 
+
 class Score(int, Enum):
     normal = 5
-    extra = 10
-    maximum = 15
+    descritivos = 7
+    uva = 8
+    pais = 9
+    safra = 10

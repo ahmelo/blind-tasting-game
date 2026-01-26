@@ -61,7 +61,7 @@ class ScoreService:
                 evaluation.aromas, answer_key.aromas
             )
             if status == "correct":
-                score += Score.extra.value
+                score += Score.descritivos.value
             elif status == "partial":
                 score += Score.normal.value
 
@@ -92,20 +92,20 @@ class ScoreService:
                 evaluation.flavors, answer_key.flavors
             )
             if status == "correct":
-                score += Score.extra.value
+                score += Score.descritivos.value
             elif status == "partial":
                 score += Score.normal.value
         if evaluation.quality == answer_key.quality:
             score += Score.normal.value
 
         if evaluation.grape is not None and evaluation.grape == answer_key.grape:
-            score += Score.maximum.value
+            score += Score.grape.value
 
         if evaluation.country is not None and evaluation.country == answer_key.country:
-            score += Score.maximum.value
+            score += Score.pais.value
 
         if evaluation.vintage is not None and evaluation.vintage == answer_key.vintage:
-            score += Score.maximum.value
+            score += Score.safra.value
 
         return score
 
