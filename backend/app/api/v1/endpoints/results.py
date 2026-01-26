@@ -8,7 +8,7 @@ from fastapi.responses import Response
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.dependencies import get_current_participant
-from app.services.results_service import get_my_results, get_my_total_score
+from app.services.results_service import get_my_results, get_my_event_result
 
 
 router = APIRouter(prefix="/results", tags=["Results"])
@@ -28,10 +28,10 @@ def export_my_result_pdf(
     participant=Depends(get_current_participant),
 ):
     results = get_my_results(db, participant.id)
-    total = my_total_score(db, participant)
+    pe = get_my_event_result(db, participant.id)
 
     html = ResultPdfRenderer.render(
-        participant_name=participant.name, results=results, total_score=total
+        participant_name=participant.name, results=results, score_total=pe.score_total
     )
 
     pdf = PdfGenerator.from_html(html)
@@ -43,10 +43,16 @@ def export_my_result_pdf(
     )
 
 
-@router.get("/my-score")
-def my_total_score(
+@router.get("/my-event")
+def my_event_result(
     db: Session = Depends(get_db),
     participant=Depends(get_current_participant),
 ):
-    total = get_my_total_score(db, participant.id)
-    return {"total_score": total}
+    pe = get_my_event_result(db, participant.id)
+
+    return {
+        "total_score": pe.score_total,
+        "score_max_total": pe.score_max_total,
+        "percentual": pe.percentual,
+        "badge": pe.badge,
+    }

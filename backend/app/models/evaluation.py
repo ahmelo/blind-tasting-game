@@ -1,6 +1,13 @@
 from sqlalchemy import (
-    Boolean, Column, String, Integer, ForeignKey, Enum,
-    UniqueConstraint, DateTime, CheckConstraint
+    Boolean,
+    Column,
+    String,
+    Integer,
+    ForeignKey,
+    Enum,
+    UniqueConstraint,
+    DateTime,
+    CheckConstraint,
 )
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
@@ -16,6 +23,7 @@ from app.enums.sweetness import Sweetness
 from app.enums.quality import Quality
 from app.enums.country import Country
 from app.enums.grape import Grape
+
 
 class Evaluation(Base):
     __tablename__ = "evaluations"
@@ -54,11 +62,13 @@ class Evaluation(Base):
     is_answer_key = Column(Boolean, default=False, nullable=False)
     score = Column(Integer, default=0, nullable=True)
 
-    submitted_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    submitted_at = Column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
 
     participant = relationship("Participant", back_populates="evaluations")
     round = relationship("Round", back_populates="evaluations")
-    
+
     __table_args__ = (
         UniqueConstraint("participant_id", "round_id"),
         CheckConstraint("visualIntensity BETWEEN 1 AND 5", name="ck_visual_intensity"),

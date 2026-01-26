@@ -9,6 +9,7 @@ import Rounds from "./pages/Rounds";
 import Winner from "./pages/Winner";
 import "./styles/ui.css";
 import type { EvaluationResultResponse } from "./types/results";
+import { storage } from "./utils/storage";
 
 
 type UserType = "sommelier" | "participant" | null;
@@ -118,6 +119,7 @@ export default function App() {
   function handleLogout() {
     setMenuOpen(false);
     setUser(null);
+    storage.clearParticipant();
 
     // PARTICIPANTE
     setEventIsOpen(null);

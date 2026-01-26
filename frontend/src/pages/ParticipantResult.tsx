@@ -22,7 +22,12 @@ export default function ParticipantResult({
     async function loadScore() {
       setLoadingScore(true);
       try {
-        const res = await apiGet<{ total_score: number }>("/results/my-score");
+        const res = await apiGet<{
+          total_score: number;
+          percentual: number;
+          badge: string;
+        }>("/results/my-event");
+
         setTotalScore(res.total_score);
       } catch {
         setTotalScore(null);

@@ -475,7 +475,7 @@ export default function Evaluation({ participantId, eventId, initialIsAnswerKey,
           <div style={{ marginTop: 16 }}>
             <button
               type="button"
-              className="btn btn-danger"
+              className="btn btn-ghost btn-danger"
               disabled={closingEvent}
               onClick={closeEvent}
             >

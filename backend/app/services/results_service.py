@@ -5,8 +5,7 @@ from app.models.event import Event
 from app.enums.scale_type import resolve_scale_label, ATTRIBUTE_SCALE
 from app.core.database import get_db
 from fastapi import HTTPException
-from app.services.score_service import ScoreService
-
+from app.models.participant_event import ParticipantEvent
 
 # Dicionário de traduções para valores de enums
 ENUM_LABELS = {
@@ -265,11 +264,13 @@ def get_my_results(
     # Descobrir os rounds que o participante respondeu
     round_ids = (
         db.query(Evaluation.round_id)
+        .join(Round, Round.id == Evaluation.round_id)
         .filter(
             Evaluation.participant_id == participant_id,
             Evaluation.is_answer_key == False,
         )
         .distinct()
+        .order_by(Round.position.asc())
         .all()
     )
 
@@ -292,23 +293,21 @@ def get_my_results(
     return results
 
 
-def get_my_total_score(db: Session, participant_id: str) -> int:
-    evaluations = (
-        db.query(Evaluation)
-        .filter(
-            Evaluation.participant_id == participant_id,
-            Evaluation.is_answer_key == False,
-        )
-        .all()
+def get_my_event_result(
+    db: Session,
+    participant_id: str,
+):
+    pe = (
+        db.query(ParticipantEvent)
+        .filter(ParticipantEvent.participant_id == participant_id)
+        .order_by(ParticipantEvent.updated_at.desc())
+        .first()
     )
 
-    total = 0
+    if not pe:
+        raise HTTPException(
+            status_code=404,
+            detail="Nenhum evento encontrado para este participante.",
+        )
 
-    for evaluation in evaluations:
-        answer_key = ScoreService.get_answer_key(db, evaluation.round_id)
-        if not answer_key:
-            continue
-
-        total += ScoreService.calculate_score(evaluation, answer_key)
-
-    return total
+    return pe

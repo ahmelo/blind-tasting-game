@@ -1,6 +1,11 @@
 from app.models.evaluation import Evaluation
+from app.models.participant_event import ParticipantEvent
+from app.models.round import Round  # ajuste import conforme seu projeto
+from decimal import Decimal, ROUND_HALF_UP
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 from app.enums.score import Score
+from app.enums.badge_category import BadgeCategory
 
 
 class ScoreService:
@@ -119,6 +124,11 @@ class ScoreService:
         if not answer_key:
             raise ValueError("Não existe gabarito para esta rodada.")
 
+        score_max = ScoreService.calculate_score_absolute(answer_key)
+        answer_key.score = score_max
+        db.add(answer_key)
+        db.flush()
+
         evaluations = (
             db.query(Evaluation)
             .filter(
@@ -128,7 +138,128 @@ class ScoreService:
         )
 
         for evaluation in evaluations:
-            evaluation.score = ScoreService.calculate_score(evaluation, answer_key)
+            participant_score = ScoreService.calculate_score(evaluation, answer_key)
+            evaluation.score = participant_score
+
+        round = db.query(Round).get(round_id)
+        if round:
+            ScoreService.recalculate_event_totals(db, round.event_id)
 
         db.commit()
         return len(evaluations)
+
+    @staticmethod
+    def calculate_score_absolute(answer_key: Evaluation) -> int:
+        # compara o gabarito consigo mesmo
+        return ScoreService.calculate_score(answer_key, answer_key)
+
+    @staticmethod
+    def calculate_percentage(participant_score: int, score_absolute: int) -> float:
+        if score_absolute == 0:
+            return 0
+        return (participant_score / score_absolute) * 100
+
+    @staticmethod
+    def get_badge(percentual: float) -> BadgeCategory:
+        # assume BadgeCategory.value tem 'min_pct'
+        sorted_badges = sorted(BadgeCategory, key=lambda b: b.value["min_pct"])
+        chosen = sorted_badges[0]
+        for badge in sorted_badges:
+            if percentual >= badge.value["min_pct"]:
+                chosen = badge
+            else:
+                break
+        return chosen
+
+    @staticmethod
+    def recalculate_event_totals(db: Session, event_id):
+        """
+        Agrega resultados do evento e atualiza/insere ParticipantEvent.
+        Considera apenas rounds que já possuam gabarito (is_answer_key=True) com score calculado.
+        Retorna número de participantes atualizados.
+        """
+        # 1) buscar rounds do evento que tenham gabarito com score não-nulo
+        rounds_with_answer = (
+            db.query(Round.id)
+            .join(Evaluation, Evaluation.round_id == Round.id)
+            .filter(
+                Round.event_id == event_id,
+                Evaluation.is_answer_key.is_(True),
+                Evaluation.score.isnot(None),
+            )
+            .distinct()
+            .all()
+        )
+        round_ids = [r.id for r in rounds_with_answer]
+        if not round_ids:
+            return 0
+
+        # 2) soma dos scores máximos (gabaritos) para essas rounds
+        score_max_total = (
+            db.query(func.coalesce(func.sum(Evaluation.score), 0))
+            .filter(
+                Evaluation.round_id.in_(round_ids), Evaluation.is_answer_key.is_(True)
+            )
+            .scalar()
+        ) or 0
+
+        # 3) soma do score por participante (somente avaliações de participantes)
+        participant_scores = (
+            db.query(
+                Evaluation.participant_id,
+                func.coalesce(func.sum(Evaluation.score), 0).label("score_total"),
+            )
+            .filter(
+                Evaluation.round_id.in_(round_ids), Evaluation.is_answer_key.is_(False)
+            )
+            .group_by(Evaluation.participant_id)
+            .all()
+        )
+
+        # 4) atualizar / inserir ParticipantEvent
+        updated_count = 0
+        for row in participant_scores:
+            participant_id = row.participant_id
+            score_total = int(row.score_total or 0)
+
+            percentual = 0.0
+            if score_max_total > 0:
+                percentual = (score_total / score_max_total) * 100.0
+
+            # arredonda para 2 casas (opcional)
+            percentual = float(
+                Decimal(percentual).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+            )
+
+            badge = ScoreService.get_badge(percentual).name
+
+            pe = (
+                db.query(ParticipantEvent)
+                .filter(
+                    ParticipantEvent.participant_id == participant_id,
+                    ParticipantEvent.event_id == event_id,
+                )
+                .first()
+            )
+
+            if not pe:
+                pe = ParticipantEvent(
+                    participant_id=participant_id,
+                    event_id=event_id,
+                    score_total=score_total,
+                    score_max_total=score_max_total,
+                    percentual=percentual,
+                    badge=badge,
+                )
+                db.add(pe)
+            else:
+                pe.score_total = score_total
+                pe.score_max_total = score_max_total
+                pe.percentual = percentual
+                pe.badge = badge
+                db.add(pe)
+
+            updated_count += 1
+
+        db.commit()
+        return updated_count

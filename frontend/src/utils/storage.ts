@@ -4,15 +4,15 @@ const USER_TYPE_KEY = "user_type";
 export const storage = {
     // ===== identidade =====
     setParticipantId(id: string) {
-        localStorage.setItem(PARTICIPANT_KEY, id);
+        sessionStorage.setItem(PARTICIPANT_KEY, id);
     },
 
     getParticipantId(): string | null {
-        return localStorage.getItem(PARTICIPANT_KEY);
+        return sessionStorage.getItem(PARTICIPANT_KEY);
     },
 
     clearParticipant() {
-        localStorage.removeItem(PARTICIPANT_KEY);
+        sessionStorage.removeItem(PARTICIPANT_KEY);
         localStorage.removeItem(USER_TYPE_KEY);
         sessionStorage.clear();
     },
