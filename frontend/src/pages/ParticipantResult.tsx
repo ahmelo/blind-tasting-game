@@ -24,7 +24,7 @@ export default function ParticipantResult({
     iniciante: "/badges/iniciante.png",
     explorador: "/badges/explorador.png",
     entusiasta: "/badges/entusiasta.png",
-    experiente: "/badges/experiente.png",
+    conhecedor: "/badges/conhecedor.png",
     especialista: "/badges/especialista.png",
   };
 

@@ -20,11 +20,11 @@ class BadgeCategory(Enum):
         "label": "Paladar Afiado",
         "key": "entusiasta",
     }
-    EXPERIENTE = {
+    CONHECEDOR = {
         "min_pct": 50.0,
         "max_pct": 75.0,
         "label": "Nariz Treinado",
-        "key": "experiente",
+        "key": "conhecedor",
     }
     ESPECIALISTA = {
         "min_pct": 75.0,
