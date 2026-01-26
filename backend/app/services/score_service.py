@@ -99,7 +99,7 @@ class ScoreService:
             score += Score.normal.value
 
         if evaluation.grape is not None and evaluation.grape == answer_key.grape:
-            score += Score.grape.value
+            score += Score.uva.value
 
         if evaluation.country is not None and evaluation.country == answer_key.country:
             score += Score.pais.value
