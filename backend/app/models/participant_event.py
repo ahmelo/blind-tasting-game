@@ -28,6 +28,7 @@ class ParticipantEvent(Base):
     )  # soma dos scores máximos do sommelier por rodada
     percentual = Column(Float, default=0.0, nullable=False)
     badge = Column(String, nullable=True)
+    badge_key = Column(String, nullable=True)
 
     updated_at = Column(
         DateTime(timezone=True),

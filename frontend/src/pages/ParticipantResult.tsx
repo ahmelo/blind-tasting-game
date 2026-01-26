@@ -17,6 +17,16 @@ export default function ParticipantResult({
 
   const [totalScore, setTotalScore] = useState<number | null>(null);
   const [loadingScore, setLoadingScore] = useState(false);
+  const [percentual, setPercentual] = useState<number | null>(null);
+  const [badge, setBadge] = useState<string | null>(null);
+  const [badgeKey, setBadgeKey] = useState<string | null>(null);
+  const BADGE_IMAGES: Record<string, string> = {
+    iniciante: "/badges/iniciante.jpeg",
+    curioso: "/badges/iniciante.jpeg",
+    afiado: "/badges/iniciante.jpeg",
+    treinado: "/badges/iniciante.jpeg",
+    sommelier: "/badges/iniciante.jpeg",
+  };
 
   useEffect(() => {
     async function loadScore() {
@@ -26,9 +36,13 @@ export default function ParticipantResult({
           total_score: number;
           percentual: number;
           badge: string;
+          badge_key: string;
         }>("/results/my-event");
 
         setTotalScore(res.total_score);
+        setPercentual(res.percentual);
+        setBadge(res.badge);
+        setBadgeKey(res.badge_key)
       } catch {
         setTotalScore(null);
       } finally {
@@ -66,10 +80,30 @@ export default function ParticipantResult({
         )}
 
         {totalScore !== null && (
-          <div className="score-highlight">
-            <span className="score-label">Seu score total é</span>
-            <span className="score-value">{totalScore}</span>
-            <span className="score-label">pontos</span>
+          <div>
+            <div className="score-highlight">
+              <span className="score-label">Seu score total é</span>
+              <span className="score-value">{totalScore}</span>
+              <span className="score-label">pontos</span>
+            </div>
+            <div className="score-highlight">
+              <span className="score-label">Você atingiu </span>
+              <span className="score-value">{percentual?.toFixed(2)}%</span>
+              <span className="score-label">dos pontos</span>
+            </div>
+            <div className="score-highlight">
+              <span className="score-label">Seu perfil sensorial é: </span>
+              <span className="score-value">{badge}</span>
+            </div>
+            {badgeKey && (
+              <div className="score-highlight">
+                <img
+                  src={BADGE_IMAGES[badgeKey]}
+                  alt={`Badge ${badge}`}
+                  className="badge-image"
+                />
+              </div>
+            )}
           </div>
         )}
 

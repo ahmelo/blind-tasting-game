@@ -8,7 +8,13 @@ from pathlib import Path
 class ResultPdfRenderer:
 
     @staticmethod
-    def render(participant_name: str, results: list[dict], score_total: int) -> str:
+    def render(
+        participant_name: str,
+        results: list[dict],
+        score_total: int,
+        percentual: int,
+        badge: str,
+    ) -> str:
         BASE_DIR = Path(__file__).resolve().parent.parent
         logo_path = BASE_DIR / "assets" / "logo_app.png"
 
@@ -67,7 +73,7 @@ class ResultPdfRenderer:
                     padding-bottom: 10px;
                 }}
                 .header-logo img {{
-                    height: 120px;
+                    height: 200px;
                 }}
                 .header-text h1 {{
                     margin: 0;
@@ -102,6 +108,8 @@ class ResultPdfRenderer:
                     <h1>{r['event_name']}</h1>
                     <h3>Participante: <strong>{participant_name}</strong></h3>
                     <h3 class="total-score">Score total: {score_total} pontos</h3>
+                    <h3 class="total-score">Você atingiu {percentual}% dos pontos</h3>
+                    <h3 class="total-score">Seu perfil sensorial é {badge}</h3>
                 </div>
             </div>
 

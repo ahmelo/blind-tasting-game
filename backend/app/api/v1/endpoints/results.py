@@ -31,7 +31,11 @@ def export_my_result_pdf(
     pe = get_my_event_result(db, participant.id)
 
     html = ResultPdfRenderer.render(
-        participant_name=participant.name, results=results, score_total=pe.score_total
+        participant_name=participant.name,
+        results=results,
+        score_total=pe.score_total,
+        percentual=pe.percentual,
+        badge=pe.badge,
     )
 
     pdf = PdfGenerator.from_html(html)
@@ -55,4 +59,5 @@ def my_event_result(
         "score_max_total": pe.score_max_total,
         "percentual": pe.percentual,
         "badge": pe.badge,
+        "badge_key": pe.badge_key,
     }

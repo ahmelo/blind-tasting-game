@@ -279,3 +279,11 @@
   display: flex;
   justify-content: center;
 }
+
+.badge-image {
+  height: 240px;
+  /* ajuste conforme o logo */
+  width: auto;
+  display: flex;
+  justify-content: center;
+}

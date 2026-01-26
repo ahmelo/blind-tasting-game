@@ -231,7 +231,9 @@ class ScoreService:
                 Decimal(percentual).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
             )
 
-            badge = ScoreService.get_badge(percentual).name
+            badge_enum = ScoreService.get_badge(percentual)
+            badge = badge_enum.name
+            badge_key = badge_enum.value["key"]
 
             pe = (
                 db.query(ParticipantEvent)
@@ -250,6 +252,7 @@ class ScoreService:
                     score_max_total=score_max_total,
                     percentual=percentual,
                     badge=badge,
+                    badge_key=badge_key,
                 )
                 db.add(pe)
             else:
