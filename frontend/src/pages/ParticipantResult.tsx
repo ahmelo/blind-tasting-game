@@ -21,11 +21,11 @@ export default function ParticipantResult({
   const [badge, setBadge] = useState<string | null>(null);
   const [badgeKey, setBadgeKey] = useState<string | null>(null);
   const BADGE_IMAGES: Record<string, string> = {
-    iniciante: "/badges/iniciante.jpeg",
-    curioso: "/badges/iniciante.jpeg",
-    afiado: "/badges/iniciante.jpeg",
-    treinado: "/badges/iniciante.jpeg",
-    sommelier: "/badges/iniciante.jpeg",
+    iniciante: "/badges/iniciante.png",
+    explorador: "/badges/explorador.png",
+    entusiasta: "/badges/entusiasta.png",
+    experiente: "/badges/experiente.png",
+    especialista: "/badges/especialista.png",
   };
 
   useEffect(() => {

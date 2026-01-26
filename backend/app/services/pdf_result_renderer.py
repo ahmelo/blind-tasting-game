@@ -17,9 +17,13 @@ class ResultPdfRenderer:
     ) -> str:
         BASE_DIR = Path(__file__).resolve().parent.parent
         logo_path = BASE_DIR / "assets" / "logo_app.png"
+        badge_path = BASE_DIR / "assets" / f"{badge}.png"
 
         with open(logo_path, "rb") as f:
             logo_base64 = base64.b64encode(f.read()).decode("utf-8")
+
+        with open(badge_path, "rb") as b:
+            badge_base64 = base64.b64encode(b.read()).decode("utf-8")
 
         rounds_html = ""
 
@@ -106,10 +110,13 @@ class ResultPdfRenderer:
                 </div>
                 <div class="header-text">
                     <h1>{r['event_name']}</h1>
-                    <h3>Participante: <strong>{participant_name}</strong></h3>
-                    <h3 class="total-score">Score total: {score_total} pontos</h3>
-                    <h3 class="total-score">Você atingiu {percentual}% dos pontos</h3>
+                    <h3 class="total-score">Parabéns <strong>{participant_name}!</strong></h3>
+                    <h3 class="total-score">Você atingiu um total de {score_total} pontos</h3>
+                    <h3 class="total-score">O que corresponde a {percentual}% do total</h3>
                     <h3 class="total-score">Seu perfil sensorial é {badge}</h3>
+                </div>
+                <div class="header-logo">
+                    <img src="data:image/png;base64,{badge_base64}" alt="badge">
                 </div>
             </div>
 

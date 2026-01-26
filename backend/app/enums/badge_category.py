@@ -4,31 +4,31 @@ from enum import Enum
 class BadgeCategory(Enum):
     INICIANTE = {
         "min_pct": 0.0,
-        "max_pct": 50.0,
+        "max_pct": 15.0,
         "label": "Iniciando o Paladar",
         "key": "iniciante",
     }
-    CURIOSO = {
-        "min_pct": 50.0,
-        "max_pct": 70.0,
+    EXPLORADOR = {
+        "min_pct": 15.0,
+        "max_pct": 30.0,
         "label": "Degustador Curioso",
-        "key": "curioso",
+        "key": "explorador",
     }
-    AFIADO = {
-        "min_pct": 70.0,
-        "max_pct": 85.0,
+    ENTUSIASTA = {
+        "min_pct": 30.0,
+        "max_pct": 50.0,
         "label": "Paladar Afiado",
-        "key": "afiado",
+        "key": "entusiasta",
     }
-    TREINADO = {
-        "min_pct": 85.0,
-        "max_pct": 95.0,
+    EXPERIENTE = {
+        "min_pct": 50.0,
+        "max_pct": 75.0,
         "label": "Nariz Treinado",
-        "key": "treinado",
+        "key": "experiente",
     }
-    SOMMELIER = {
-        "min_pct": 95.0,
+    ESPECIALISTA = {
+        "min_pct": 75.0,
         "max_pct": 100.01,
         "label": "Leitor de Taça",
-        "key": "sommelier",
+        "key": "especialista",
     }

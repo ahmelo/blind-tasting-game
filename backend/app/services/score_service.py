@@ -232,7 +232,7 @@ class ScoreService:
             )
 
             badge_enum = ScoreService.get_badge(percentual)
-            badge = badge_enum.name
+            badge = badge_enum.valeu["label"]
             badge_key = badge_enum.value["key"]
 
             pe = (
