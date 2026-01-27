@@ -1,5 +1,8 @@
-import { useEffect, useState } from "react";
+import { toPng } from "html-to-image";
+import { useEffect, useRef, useState } from "react";
 import { apiDownload, apiGet } from "../api/client";
+import ShareCard from "../components/ShareCard";
+
 import "../styles/participant_result.css";
 import type { EvaluationResultResponse } from "../types/results";
 
@@ -27,6 +30,8 @@ export default function ParticipantResult({
     conhecedor: "/badges/conhecedor.png",
     especialista: "/badges/especialista.png",
   };
+  const [hasShared, setHasShared] = useState(false);
+  const shareCardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     async function loadScore() {
@@ -62,6 +67,40 @@ export default function ParticipantResult({
     }
   };
 
+  const handleShare = async () => {
+    if (!shareCardRef.current) return;
+
+    try {
+      const dataUrl = await toPng(shareCardRef.current, {
+        cacheBust: true,
+        pixelRatio: 2,
+      });
+
+      const blob = await (await fetch(dataUrl)).blob();
+      const file = new File([blob], "resultado-degustacao.png", {
+        type: "image/png",
+      });
+
+      if (navigator.share && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: "Meu resultado na Degustação às Cegas",
+        });
+      } else {
+        // fallback: download
+        const link = document.createElement("a");
+        link.href = dataUrl;
+        link.download = "resultado-degustacao.png";
+        link.click();
+      }
+
+      setHasShared(true);
+    } catch (err) {
+      console.error("Erro ao compartilhar imagem:", err);
+    }
+  };
+
+
   return (
     <div className="participant-result full-width">
 
@@ -82,17 +121,17 @@ export default function ParticipantResult({
         {totalScore !== null && (
           <div>
             <div className="score-highlight">
-              <span className="score-label">Seu score total é</span>
+              <span className="score-label">Meu score total é</span>
               <span className="score-value">{totalScore}</span>
               <span className="score-label">pontos</span>
             </div>
             <div className="score-highlight">
-              <span className="score-label">Você atingiu </span>
+              <span className="score-label">Atingi </span>
               <span className="score-value">{percentual?.toFixed(2)}%</span>
               <span className="score-label">dos pontos</span>
             </div>
             <div className="score-highlight">
-              <span className="score-label">Seu perfil sensorial é: </span>
+              <span className="score-label">Meu perfil sensorial é: </span>
               <span className="score-value">{badge}</span>
             </div>
             {badgeKey && (
@@ -108,6 +147,8 @@ export default function ParticipantResult({
         )}
 
       </div>
+
+
 
       {/* ===== ROUNDS ===== */}
       {results.map((round) => {
@@ -220,14 +261,42 @@ export default function ParticipantResult({
       })}
 
       {/* ===== PDF ===== */}
-      <div className="stack" style={{ marginTop: "1rem" }}>
+      <div className="card stack" style={{ marginTop: "1rem" }}>
         <button
           onClick={handleDownloadPdf}
           className="btn btn-primary"
         >
           📄 Baixar resultado em PDF
         </button>
+
+
+        {/* ===== SHARE ===== */}
+        {!hasShared ? (
+          <button className="btn btn-primary" onClick={handleShare}>
+            📤 Compartilhar no Instagram
+          </button>
+        ) : (
+          <div className="shared-feedback">
+            🙌 Obrigado por compartilhar!
+          </div>
+        )}
       </div>
+
+      {totalScore !== null &&
+        percentual !== null &&
+        badge &&
+        badgeKey && (
+          <div style={{ position: "absolute", left: "-9999px" }}>
+            <ShareCard
+              ref={shareCardRef}
+              totalScore={totalScore}
+              percentual={percentual}
+              badge={badge}
+              badgeKey={badgeKey}
+            />
+          </div>
+        )}
+
 
     </div>
   );
