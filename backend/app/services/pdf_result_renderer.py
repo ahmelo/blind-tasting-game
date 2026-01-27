@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import List
 from app.schemas.results import EvaluationResultResponse
+from app.enums.badge_category import BadgeCategory
 import base64
 from pathlib import Path
 
@@ -63,6 +64,28 @@ class ResultPdfRenderer:
             </section>
             """
 
+        profiles_html = ""
+
+        for category in BadgeCategory:
+            key = category.value["key"]
+            description = category.value["label"]
+            is_current = key == badge
+
+            badge_img_path = BASE_DIR / "assets" / f"{key}.png"
+            with open(badge_img_path, "rb") as b:
+                badge_img_base64 = base64.b64encode(b.read()).decode("utf-8")
+
+            profiles_html += f"""
+            <tr class="profile-row {'current' if is_current else ''}">
+                <td class="profile-badge">
+                    <img src="data:image/png;base64,{badge_img_base64}" />
+                </td>
+                <td class="profile-description">
+                    {description}
+                </td>
+            </tr>
+            """
+
         return f"""
         <html>
         <head>
@@ -101,6 +124,42 @@ class ResultPdfRenderer:
                 tr.correct {{ background: #e8f5e9; }}
                 tr.partial {{ background: #fffde7; }}
                 tr.wrong {{ background: #ffebee; }}
+                .profiles {{
+                    margin-top: 40px;
+                }}
+
+                .profiles-table {{
+                    width: 100%;
+                    border-collapse: collapse;
+                }}
+
+                .profiles-table td {{
+                    border: 0px solid #ddd;
+                    padding: 12px;
+                    vertical-align: middle;
+                    font-size: 13px;
+                }}
+
+                .profile-badge {{
+                    width: 100px;
+                    text-align: center;
+                }}
+
+                .profile-badge img {{
+                    width: 100px;
+                    height: auto;
+                }}
+
+                .profile-description {{
+                    line-height: 1.5;
+                    color: #333;
+                }}
+
+                .profile-row.current {{
+                    background: #eef6ff;
+                    border-left: 4px solid #2563eb;
+                }}
+
             </style>
         </head>
         <body>
@@ -121,6 +180,16 @@ class ResultPdfRenderer:
             </div>
 
             {rounds_html}
+
+            <section class="profiles">
+                <h2>Perfis Sensoriais</h2>
+                <table class="profiles-table">
+                    <tbody>
+                        {profiles_html}
+                    </tbody>
+                </table>
+            </section>
+
         </body>
         </html>
         """
