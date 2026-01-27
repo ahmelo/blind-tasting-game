@@ -4,6 +4,7 @@ import { apiDownload, apiGet } from "../api/client";
 import ShareCard from "../components/ShareCard";
 
 import "../styles/participant_result.css";
+import "../styles/share_card.css";
 import type { EvaluationResultResponse } from "../types/results";
 
 interface ParticipantResultProps {
@@ -268,7 +269,6 @@ export default function ParticipantResult({
         >
           📄 Baixar resultado em PDF
         </button>
-
 
         {/* ===== SHARE ===== */}
         {!hasShared ? (
