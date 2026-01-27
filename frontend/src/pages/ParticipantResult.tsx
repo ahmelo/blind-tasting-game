@@ -33,6 +33,8 @@ export default function ParticipantResult({
   };
   const [hasShared, setHasShared] = useState(false);
   const shareCardRef = useRef<HTMLDivElement>(null);
+  const [downloadingPdf, setDownloadingPdf] = useState(false);
+
 
   useEffect(() => {
     async function loadScore() {
@@ -61,10 +63,13 @@ export default function ParticipantResult({
 
   const handleDownloadPdf = async () => {
     try {
+      setDownloadingPdf(true);
       await apiDownload("/results/pdf", "resultado-avaliacao.pdf");
     } catch (err) {
       console.error(err);
       alert("Não foi possível gerar o PDF");
+    } finally {
+      setDownloadingPdf(false);
     }
   };
 
@@ -266,8 +271,9 @@ export default function ParticipantResult({
         <button
           onClick={handleDownloadPdf}
           className="btn btn-primary"
+          disabled={downloadingPdf}
         >
-          📄 Baixar resultado em PDF
+          {downloadingPdf ? "⏳ Gerando PDF..." : "📄 Baixar resultado em PDF"}
         </button>
 
         {/* ===== SHARE ===== */}
