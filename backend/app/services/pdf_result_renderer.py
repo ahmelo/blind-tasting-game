@@ -84,6 +84,7 @@ class ResultPdfRenderer:
                     {description}
                 </td>
             </tr>
+
             """
 
         return f"""
@@ -159,6 +160,10 @@ class ResultPdfRenderer:
                     background: #eef6ff;
                     border-left: 4px solid #2563eb;
                 }}
+                .texto {{
+                    display: block;
+                    text-align: center;
+                    }}
 
             </style>
         </head>
@@ -188,6 +193,10 @@ class ResultPdfRenderer:
                         {profiles_html}
                     </tbody>
                 </table>
+                <div>
+                    <span class="texto">O desenvolvimento do perfil sensorial vem com prática, <br />
+                      repertório e boas degustações guiadas. 🍷🍷</span>
+                </div>
             </section>
 
         </body>
