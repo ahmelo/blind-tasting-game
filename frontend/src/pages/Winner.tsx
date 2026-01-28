@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import { apiGet } from "../api/client";
-import type { EventWinnerResponse } from "../types/event";
+import type { EventWinnerResponse, EventWinnersResponse } from "../types/event";
 
 interface WinnerProps {
   eventId: string;
 }
 
 export default function Winner({ eventId }: WinnerProps) {
-  const [winner, setWinner] = useState<EventWinnerResponse | null>(null);
+  const [winners, setWinners] = useState<EventWinnerResponse[]>([]);
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -16,8 +17,10 @@ export default function Winner({ eventId }: WinnerProps) {
       setLoading(true);
       setError("");
       try {
-        const res = await apiGet<EventWinnerResponse>(`/events/${eventId}/winner`);
-        setWinner(res);
+        const res = await apiGet<EventWinnersResponse>(
+          `/events/${eventId}/winner`
+        );
+        setWinners(res.winners);
       } catch (err: any) {
         setError(err?.message ?? "Erro ao carregar vencedor");
       } finally {
@@ -31,7 +34,7 @@ export default function Winner({ eventId }: WinnerProps) {
     <div style={{ textAlign: "center" }}>
       {loading && <p>Carregando vencedor...</p>}
       {error && <p style={{ color: "#f66" }}>{error}</p>}
-      {!loading && !error && winner && (
+      {!loading && !error && winners.length > 0 && (
         <div
           style={{
             padding: 24,
@@ -39,14 +42,27 @@ export default function Winner({ eventId }: WinnerProps) {
             border: "2px solid #ffd700",
             borderRadius: 8,
             display: "inline-block",
-            minWidth: 200,
+            minWidth: 260,
           }}
         >
-          <h2 style={{ margin: 0, marginBottom: 8 }}>🏆 {winner.participant_name}</h2>
-          <p style={{ fontWeight: "bold", fontSize: 18 }}>Score: {winner.total_score}</p>
+          <h2 style={{ marginBottom: 12 }}>
+            🏆 {winners.length > 1 ? "Empate!" : "Vencedor"}
+          </h2>
+
+          {winners.map((winner) => (
+            <div key={winner.participant_id} style={{ marginBottom: 8 }}>
+              <strong>{winner.participant_name}</strong>
+              <div style={{ fontSize: 16 }}>
+                Score: {winner.total_score}
+              </div>
+            </div>
+          ))}
         </div>
       )}
-      {!loading && !error && !winner && <p>Nenhum vencedor encontrado.</p>}
+
+      {!loading && !error && winners.length === 0 && (
+        <p>Nenhum vencedor encontrado.</p>
+      )}
     </div>
   );
 }
