@@ -1,10 +1,8 @@
-import { toPng } from "html-to-image";
 import { useEffect, useRef, useState } from "react";
 import { apiDownload, apiGet } from "../api/client";
-import ShareCard from "../components/ShareCard";
+import ShareCard, { type ShareCardHandle } from "../components/ShareCard";
 
 import "../styles/participant_result.css";
-import "../styles/share_card.css";
 import type { EvaluationResultResponse } from "../types/results";
 
 interface ParticipantResultProps {
@@ -32,7 +30,7 @@ export default function ParticipantResult({
     especialista: "/badges/especialista.png",
   };
   const [hasShared, setHasShared] = useState(false);
-  const shareCardRef = useRef<HTMLDivElement>(null);
+  const shareCardRef = useRef<ShareCardHandle>(null);
   const [downloadingPdf, setDownloadingPdf] = useState(false);
 
 
@@ -64,18 +62,44 @@ export default function ParticipantResult({
   async function waitForImages(element: HTMLElement) {
     const images = Array.from(element.querySelectorAll("img"));
 
+    console.log(`[ShareCard] Aguardando ${images.length} imagens`);
+
     await Promise.all(
-      images.map((img) => {
+      images.map((img, idx) => {
+        console.log(`[ShareCard] Imagem ${idx}: complete=${img.complete}, naturalWidth=${img.naturalWidth}, src=${img.src}`);
+        
         if (img.complete && img.naturalWidth !== 0) {
+          console.log(`[ShareCard] Imagem ${idx} já está completa`);
           return Promise.resolve();
         }
 
         return new Promise<void>((resolve) => {
-          img.onload = () => resolve();
-          img.onerror = () => resolve(); // não bloqueia
+          const timeout = setTimeout(() => {
+            console.log(`[ShareCard] Timeout em imagem ${idx}`);
+            resolve();
+          }, 5000); // aumentado para 5s
+          
+          const onLoad = () => {
+            clearTimeout(timeout);
+            console.log(`[ShareCard] Imagem ${idx} carregada`);
+            resolve();
+          };
+          
+          const onError = () => {
+            clearTimeout(timeout);
+            console.log(`[ShareCard] Erro ao carregar imagem ${idx}`);
+            resolve();
+          };
+          
+          img.addEventListener("load", onLoad, { once: true });
+          img.addEventListener("error", onError, { once: true });
         });
       })
     );
+
+    console.log("[ShareCard] Todas as imagens carregadas, aguardando 500ms");
+    await new Promise(resolve => setTimeout(resolve, 500));
+    console.log("[ShareCard] Pronto para captura");
   }
 
 
@@ -95,33 +119,41 @@ export default function ParticipantResult({
     if (!shareCardRef.current) return;
 
     try {
+      console.log("[ShareCard] Iniciando renderização do canvas");
+      
+      // Aguarda o badge estar carregado
+      await new Promise(resolve => setTimeout(resolve, 500));
 
-      await waitForImages(shareCardRef.current);
+      const canvas = await shareCardRef.current.toCanvas();
+      console.log("[ShareCard] Canvas renderizado com sucesso");
 
-      const dataUrl = await toPng(shareCardRef.current, {
-        cacheBust: true,
-        pixelRatio: 2,
-      });
+      canvas.toBlob(async (blob) => {
+        if (!blob) {
+          console.error("Erro: blob não gerado");
+          return;
+        }
 
-      const blob = await (await fetch(dataUrl)).blob();
-      const file = new File([blob], "resultado-degustacao.png", {
-        type: "image/png",
-      });
-
-      if (navigator.share && navigator.canShare({ files: [file] })) {
-        await navigator.share({
-          files: [file],
-          title: "Meu resultado na Degustação às Cegas",
+        const file = new File([blob], "resultado-degustacao.png", {
+          type: "image/png",
         });
-      } else {
-        // fallback: download
-        const link = document.createElement("a");
-        link.href = dataUrl;
-        link.download = "resultado-degustacao.png";
-        link.click();
-      }
 
-      setHasShared(true);
+        if (navigator.share && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            title: "Meu resultado na Degustação às Cegas",
+          });
+        } else {
+          // fallback: download
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = "resultado-degustacao.png";
+          link.click();
+          URL.revokeObjectURL(url);
+        }
+
+        setHasShared(true);
+      });
     } catch (err) {
       console.error("Erro ao compartilhar imagem:", err);
     }
@@ -313,21 +345,13 @@ export default function ParticipantResult({
         percentual !== null &&
         badge &&
         badgeKey && (
-          <div style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            opacity: 0,
-            pointerEvents: "none",
-          }}>
-            <ShareCard
-              ref={shareCardRef}
-              totalScore={totalScore}
-              percentual={percentual}
-              badge={badge}
-              badgeKey={badgeKey}
-            />
-          </div>
+          <ShareCard
+            ref={shareCardRef}
+            totalScore={totalScore}
+            percentual={percentual}
+            badge={badge}
+            badgeKey={badgeKey}
+          />
         )}
 
 
