@@ -70,7 +70,7 @@ export default function ParticipantResult({
           return Promise.resolve();
         }
 
-        return new Promise<void>((resolve, reject) => {
+        return new Promise<void>((resolve) => {
           img.onload = () => resolve();
           img.onerror = () => resolve(); // não bloqueia
         });

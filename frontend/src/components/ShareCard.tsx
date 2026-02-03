@@ -17,7 +17,7 @@ const BADGE_IMAGES: Record<string, string> = {
 };
 
 const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
-    ({ totalScore, percentual, badge, badgeKey }, ref) => {
+    ({ totalScore, percentual, badgeKey }, ref) => {
         return (
             <div className="share-card" ref={ref}>
                 {/* HEADER */}
