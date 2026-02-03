@@ -31,12 +31,12 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
                         <span className="label">Meu perfil sensorial é</span>
                     </div>
 
-                    <div className="share-badge">
-                        <img
-                            src={BADGE_IMAGES[badgeKey]}
-                            alt={`Badge ${badge}`}
-                        />
-                    </div>
+                    <div
+                        className="share-badge"
+                        style={{
+                            backgroundImage: `url(${BADGE_IMAGES[badgeKey]})`,
+                        }}
+                    />
 
                     <div className="share-score">
                         <span className="label">Meu score total foi</span>

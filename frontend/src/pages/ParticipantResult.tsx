@@ -61,6 +61,24 @@ export default function ParticipantResult({
     loadScore();
   }, []);
 
+  async function waitForImages(element: HTMLElement) {
+    const images = Array.from(element.querySelectorAll("img"));
+
+    await Promise.all(
+      images.map((img) => {
+        if (img.complete && img.naturalWidth !== 0) {
+          return Promise.resolve();
+        }
+
+        return new Promise<void>((resolve, reject) => {
+          img.onload = () => resolve();
+          img.onerror = () => resolve(); // não bloqueia
+        });
+      })
+    );
+  }
+
+
   const handleDownloadPdf = async () => {
     try {
       setDownloadingPdf(true);
@@ -77,6 +95,9 @@ export default function ParticipantResult({
     if (!shareCardRef.current) return;
 
     try {
+
+      await waitForImages(shareCardRef.current);
+
       const dataUrl = await toPng(shareCardRef.current, {
         cacheBust: true,
         pixelRatio: 2,
@@ -292,7 +313,13 @@ export default function ParticipantResult({
         percentual !== null &&
         badge &&
         badgeKey && (
-          <div style={{ position: "absolute", left: "-9999px" }}>
+          <div style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            opacity: 0,
+            pointerEvents: "none",
+          }}>
             <ShareCard
               ref={shareCardRef}
               totalScore={totalScore}

@@ -182,6 +182,9 @@
   border: 1px solid transparent;
   cursor: pointer;
   transition: transform .05s ease, background-color .15s ease, border-color .15s ease, box-shadow .15s ease;
+  -webkit-appearance: none;
+  appearance: none;
+  text-decoration: none;  
 }
 
 .btn:active {
@@ -300,11 +303,15 @@
   align-items: center;
   gap: 12px;
   text-align: left;
-
+  color: #111827;
   border: none;
   background: #f6f7f8;
   border-radius: 14px;
   padding: 14px;
+  -webkit-appearance: none;
+  appearance: none;
+
+  text-decoration: none;
 
   cursor: pointer;
   transition: transform .06s ease, background-color .15s ease, box-shadow .15s ease;
@@ -719,6 +726,9 @@
   text-align: left;
   font-size: 14px;
   cursor: pointer;
+  color: #111827;               /* 👈 força a cor */
+  -webkit-appearance: none;
+  appearance: none;
 }
 
 @media (max-width: 640px) {
