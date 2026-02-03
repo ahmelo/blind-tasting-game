@@ -20,7 +20,7 @@ export interface ShareCardHandle {
 }
 
 const ShareCard = forwardRef<ShareCardHandle, ShareCardProps>(
-  ({ totalScore, percentual, badge, badgeKey }, ref) => {
+  ({ totalScore, percentual, badgeKey }, ref) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [badgeImage, setBadgeImage] = useState<HTMLImageElement | null>(null);
 

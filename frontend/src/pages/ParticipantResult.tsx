@@ -59,50 +59,6 @@ export default function ParticipantResult({
     loadScore();
   }, []);
 
-  async function waitForImages(element: HTMLElement) {
-    const images = Array.from(element.querySelectorAll("img"));
-
-    console.log(`[ShareCard] Aguardando ${images.length} imagens`);
-
-    await Promise.all(
-      images.map((img, idx) => {
-        console.log(`[ShareCard] Imagem ${idx}: complete=${img.complete}, naturalWidth=${img.naturalWidth}, src=${img.src}`);
-        
-        if (img.complete && img.naturalWidth !== 0) {
-          console.log(`[ShareCard] Imagem ${idx} já está completa`);
-          return Promise.resolve();
-        }
-
-        return new Promise<void>((resolve) => {
-          const timeout = setTimeout(() => {
-            console.log(`[ShareCard] Timeout em imagem ${idx}`);
-            resolve();
-          }, 5000); // aumentado para 5s
-          
-          const onLoad = () => {
-            clearTimeout(timeout);
-            console.log(`[ShareCard] Imagem ${idx} carregada`);
-            resolve();
-          };
-          
-          const onError = () => {
-            clearTimeout(timeout);
-            console.log(`[ShareCard] Erro ao carregar imagem ${idx}`);
-            resolve();
-          };
-          
-          img.addEventListener("load", onLoad, { once: true });
-          img.addEventListener("error", onError, { once: true });
-        });
-      })
-    );
-
-    console.log("[ShareCard] Todas as imagens carregadas, aguardando 500ms");
-    await new Promise(resolve => setTimeout(resolve, 500));
-    console.log("[ShareCard] Pronto para captura");
-  }
-
-
   const handleDownloadPdf = async () => {
     try {
       setDownloadingPdf(true);
