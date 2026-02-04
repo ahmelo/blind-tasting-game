@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.services.event_service import EventService
-from app.schemas.event import EventRankingResponse
-from app.schemas.event import EventWinnersResponse
+from app.schemas.event import EventAnswerKeyItem, EventWinnersResponse, EventRankingResponse
+
 from app.models.event import Event
 from pydantic import BaseModel
 from typing import List, Optional
@@ -24,6 +24,25 @@ class EventResponse(BaseModel):
     name: str
     access_code: Optional[str]
     is_open: bool
+
+@router.get(
+    "/events/{event_id}/answer-key",
+    response_model=List[EventAnswerKeyItem]
+)
+def get_event_answer_key(event_id: UUID, db: Session = Depends(get_db)) -> List[EventAnswerKeyItem]:
+    """
+    Retorna o gabarito de um evento.
+    Acesso: apenas sommeliers (sem autenticação de participante)
+    """
+    answer_key = EventService.get_event_answer_key(db, event_id)
+
+    if not answer_key:
+        raise HTTPException(
+            status_code=404,
+            detail="Nenhum gabarito encontrado para este evento"
+        )
+
+    return answer_key
 
 
 @router.get("/events/{event_id}/winner", response_model=EventWinnersResponse)

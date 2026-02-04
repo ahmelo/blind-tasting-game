@@ -86,3 +86,56 @@ class EventService:
         db.commit()
 
         return event
+    
+    @staticmethod
+    def get_event_answer_key(db, event_id):
+        rounds = (
+            db.query(Round)
+            .filter(Round.event_id == event_id)
+            .order_by(Round.position.asc())
+            .all()
+        )
+
+        result = []
+
+        for r in rounds:
+            evaluation = (
+                db.query(Evaluation)
+                .filter(
+                    Evaluation.round_id == r.id,
+                    Evaluation.is_answer_key.is_(True),
+                )
+                .first()
+            )
+
+            if not evaluation:
+                continue  # rodada sem gabarito ainda
+
+            result.append({
+                "round_id": r.id,
+                "round_name": r.name,
+
+                "limpidity": evaluation.limpidity,
+                "visualIntensity": evaluation.visualIntensity,
+                "color_type": evaluation.color_type,
+                "color_tone": evaluation.color_tone,
+
+                "condition": evaluation.condition,
+                "aromaIntensity": evaluation.aromaIntensity,
+                "aromas": evaluation.aromas,
+
+                "sweetness": evaluation.sweetness,
+                "tannin": evaluation.tannin,
+                "alcohol": evaluation.alcohol,
+                "consistence": evaluation.consistence,
+                "acidity": evaluation.acidity,
+                "persistence": evaluation.persistence,
+                "flavors": evaluation.flavors,
+
+                "quality": evaluation.quality,
+                "grape": evaluation.grape,
+                "country": evaluation.country,
+                "vintage": evaluation.vintage,
+            })
+
+        return result

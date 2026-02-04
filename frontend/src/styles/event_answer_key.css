@@ -1,0 +1,114 @@
+/* Event Answer Key Styles */
+
+.answer-key-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.answer-key-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 1rem;
+}
+
+.answer-key-round {
+  background: #ffffff;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.answer-key-round h4 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #2c2c2c;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+/* Fieldset styling */
+.answer-key-group {
+  border: 1px solid var(--sv-border);
+  border-radius: 14px;
+  padding: 12px;
+  background: #fff;
+}
+
+.answer-key-group:last-of-type {
+  margin-bottom: 0;
+}
+
+.answer-key-group-title {
+  display: block;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  padding: 0.75rem 1rem;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  
+}
+
+.answer-key-field {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #e8e8e8;
+  align-items: center;
+
+
+}
+
+.answer-key-field:last-child {
+  border-bottom: none;
+}
+
+.answer-key-label {
+  font-weight: 600;
+  color: #555;
+  font-size: 0.95rem;
+}
+
+.answer-key-value {
+  color: #1a1a1a;
+  font-weight: 500;
+  font-size: 0.95rem;
+  text-align: right;
+}
+
+.answer-key-empty {
+  color: #999;
+  font-style: italic;
+}
+
+/* Responsivo */
+@media (max-width: 640px) {
+  .answer-key-round {
+    padding: 1.5rem;
+  }
+
+  .answer-key-field {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+    margin-left: 0;
+  }
+
+  .answer-key-label {
+    font-size: 0.9rem;
+  }
+
+  .answer-key-value {
+    font-size: 0.9rem;
+  }
+}
+
+/* Botão voltar */
+.answer-key-back-button {
+  margin-top: 2rem;
+}

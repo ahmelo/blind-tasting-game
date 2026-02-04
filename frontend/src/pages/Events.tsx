@@ -11,9 +11,12 @@ type EventItem = {
 export default function Events({
   onBack,
   onViewResult,
+  onViewAnswerKey,
 }: {
   onBack: () => void;
   onViewResult: (eventId: string) => void;
+  onViewAnswerKey: (eventId: string) => void;
+
 }) {
   const [events, setEvents] = useState<EventItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -73,9 +76,6 @@ export default function Events({
         <input value={newCode} onChange={(e) => setNewCode(e.target.value)} className="input" placeholder="Código" />
         <button className="btn btn-primary">Criar</button>
 
-        <label className="label" htmlFor="eventCode">
-          Código do Evento
-        </label>
       </form>
 
       {loading && <p>Carregando…</p>}
@@ -87,12 +87,21 @@ export default function Events({
 
           <div className="event-row-actions">
             {!ev.is_open && (
-              <button
-                className="btn btn-primary"
-                onClick={() => onViewResult(ev.id)}
-              >
-                Ver resultado
-              </button>
+              <>
+                <button
+                  className="btn btn-primary"
+                  onClick={() => onViewResult(ev.id)}
+                >
+                  Ver resultado
+                </button>
+
+                <button
+                  className="btn btn-ghost"
+                  onClick={() => onViewAnswerKey(ev.id)}
+                >
+                  Ver gabarito
+                </button>
+              </>
             )}
 
             <button

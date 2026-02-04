@@ -10,7 +10,7 @@ import Winner from "./pages/Winner";
 import "./styles/ui.css";
 import type { EvaluationResultResponse } from "./types/results";
 import { storage } from "./utils/storage";
-
+import EventAnswerKey from "./pages/EventAnswerKey";
 
 type UserType = "sommelier" | "participant" | null;
 
@@ -19,7 +19,8 @@ type SommelierView =
   | "events"
   | "rounds"
   | "gabarito"
-  | "event-result";
+  | "event-result"
+  | "event-answer-key";
 
 export default function App() {
   const [user, setUser] = useState<{ type: UserType; info: any } | null>(null);
@@ -279,6 +280,10 @@ export default function App() {
                   setSelectedEventId(eventId);
                   setSommelierView("event-result");
                 }}
+                onViewAnswerKey={(eventId: string) => {
+                  setSelectedEventId(eventId);
+                  setSommelierView("event-answer-key");
+                }}
               />
             )}
 
@@ -353,6 +358,24 @@ export default function App() {
 
               </div>
             )}
+
+            {/* ================= EVENT ANSWER KEY ================= */}
+            {sommelierView === "event-answer-key" && selectedEventId && (
+              <div className="stack">
+                <button
+                  className="btn btn-ghost"
+                  onClick={() => setSommelierView("events")}
+                >
+                  Voltar
+                </button>
+
+                <EventAnswerKey
+                  eventId={selectedEventId}
+                  onBack={() => setSommelierView("events")}
+                />
+              </div>
+            )}
+
 
           </div>
         </main>
