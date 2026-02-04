@@ -29,12 +29,19 @@ class EventService:
 
         ranking = []
 
-        for position, row in enumerate(results, start=1):
+        current_position = 0
+        last_score = None
+
+        for row in results:
             participant_id, participant_name, total_score = row
+
+            if last_score is None or total_score < last_score:
+                current_position += 1
+                last_score = total_score
 
             ranking.append(
                 {
-                    "position": position,
+                    "position": current_position,
                     "participant_id": participant_id,
                     "participant_name": participant_name,
                     "total_score": total_score,
