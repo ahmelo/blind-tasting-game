@@ -160,7 +160,7 @@ def get_open_round(event_id: UUID, db: Session = Depends(get_db)):
 
 
 @router.post("/events/{event_id}/close")
-def close_event(event_id: str, db: Session = Depends(get_db)):
+def close_event(event_id: UUID, db: Session = Depends(get_db)):
     try:
         EventService.close_event(db, event_id)
         return {"message": "Evento fechado com sucesso."}

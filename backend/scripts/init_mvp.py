@@ -28,7 +28,7 @@ def init_mvp():
 
     if not sommelier:
         sommelier = Participant(
-            id=str(uuid.uuid4()),
+            id=uuid.uuid4(),
             name=SOMMELIER_NAME,
             role=UserRole.SOMMELIER,
             password_hash=hash_password(SOMMELIER_PASSWORD)
@@ -47,7 +47,7 @@ def init_mvp():
 
     if not participant:
         participant = Participant(
-            id=str(uuid.uuid4()),
+            id=uuid.uuid4(),
             name=TEST_PARTICIPANT_NAME,
             role=UserRole.PARTICIPANT,
             password_hash=None
@@ -62,7 +62,7 @@ def init_mvp():
     event = db.query(Event).filter(Event.name == EVENT_NAME).first()
     if not event:
         event = Event(
-            id=str(uuid.uuid4()),
+            id=uuid.uuid4(),
             name=EVENT_NAME,
             is_open=True,
             access_code=1,
@@ -79,7 +79,7 @@ def init_mvp():
     round_ = db.query(Round).filter(Round.event_id == event.id, Round.position == 1).first()
     if not round_:
         round_ = Round(
-            id=str(uuid.uuid4()),
+            id=uuid.uuid4(),
             event_id=event.id,
             position=1,
             name="Rodada 1",
@@ -94,7 +94,7 @@ def init_mvp():
     round_ = db.query(Round).filter(Round.event_id == event.id, Round.position == 2).first()
     if not round_:
         round_ = Round(
-            id=str(uuid.uuid4()),
+            id=uuid.uuid4(),
             event_id=event.id,
             position=2,
             name="Rodada 2",

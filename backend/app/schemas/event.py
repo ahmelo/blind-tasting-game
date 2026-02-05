@@ -17,7 +17,7 @@ class EventWinnerResponse(BaseModel):
     total_score: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class EventRankingResponse(BaseModel):
@@ -27,7 +27,7 @@ class EventRankingResponse(BaseModel):
     total_score: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class EventWinnersResponse(BaseModel):

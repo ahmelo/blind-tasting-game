@@ -59,7 +59,6 @@ hypothesis/
 
 # Frameworks comuns (opcional, mas seguro)
 instance/
-*.sqlite3
 
 # =========================================================
 # Node / React

@@ -6,6 +6,8 @@ from app.enums.scale_type import resolve_scale_label, ATTRIBUTE_SCALE
 from app.core.database import get_db
 from fastapi import HTTPException
 from app.models.participant_event import ParticipantEvent
+from uuid import UUID
+
 
 # Dicionário de traduções para valores de enums
 ENUM_LABELS = {
@@ -172,9 +174,9 @@ def _build_item(attribute, label, participant_eval, answer_key_eval):
 
 
 def build_participant_result(
-    participant_id: str,
-    round_id: str,
-    db: Session | None = None,
+    participant_id: UUID,
+    round_id: UUID,
+    db: Session,
 ):
     close_db = False
 
@@ -188,7 +190,7 @@ def build_participant_result(
             .filter(
                 Evaluation.participant_id == participant_id,
                 Evaluation.round_id == round_id,
-                Evaluation.is_answer_key == False,
+                Evaluation.is_answer_key.is_(False),
             )
             .one_or_none()
         )
@@ -197,7 +199,7 @@ def build_participant_result(
             db.query(Evaluation)
             .filter(
                 Evaluation.round_id == round_id,
-                Evaluation.is_answer_key == True,
+                Evaluation.is_answer_key.is_(True),
             )
             .one_or_none()
         )
@@ -259,30 +261,32 @@ def build_participant_result(
 
 def get_my_results(
     db: Session,
-    participant_id: str,
+    participant_id: UUID,
 ):
     # Descobrir os rounds que o participante respondeu
-    round_ids = (
-        db.query(Evaluation.round_id)
+    rounds_with_position = (
+        db.query(Evaluation.round_id, Round.position)
         .join(Round, Round.id == Evaluation.round_id)
         .filter(
             Evaluation.participant_id == participant_id,
-            Evaluation.is_answer_key == False,
+            Evaluation.is_answer_key.is_(False),
         )
         .distinct()
         .order_by(Round.position.asc())
         .all()
     )
-
-    if not round_ids:
+  
+    if not rounds_with_position:
         raise HTTPException(
             status_code=404,
             detail="Nenhum resultado encontrado para este participante.",
         )
 
+    round_ids = [r.round_id for r in rounds_with_position]
+
     results = []
 
-    for (round_id,) in round_ids:
+    for round_id in round_ids:
         result = build_participant_result(
             participant_id=participant_id,
             round_id=round_id,
@@ -295,7 +299,7 @@ def get_my_results(
 
 def get_my_event_result(
     db: Session,
-    participant_id: str,
+    participant_id: UUID,
 ):
     pe = (
         db.query(ParticipantEvent)

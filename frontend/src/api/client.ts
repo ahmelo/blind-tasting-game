@@ -1,7 +1,7 @@
 import { NetworkError } from "../errors/NetworkError";
 import { storage } from "../utils/storage";
 
-const API_BASE = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api/v1";
+const API_BASE = import.meta.env.VITE_API_BASE ?? "http://localhost:10000/api/v1";
 
 export async function apiPost<TReq, TRes>(path: string, body: TReq): Promise<TRes> {
   try {

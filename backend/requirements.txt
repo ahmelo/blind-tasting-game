@@ -5,5 +5,5 @@ alembic
 python-dotenv
 pydantic
 passlib[bcrypt]
-bcrypt
 weasyprint
+psycopg2-binary

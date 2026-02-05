@@ -18,7 +18,7 @@ class ResultPdfRenderer:
     ) -> str:
         BASE_DIR = Path(__file__).resolve().parent.parent
         logo_path = BASE_DIR / "assets" / "logo_app.png"
-        badge_path = BASE_DIR / "assets" / f"{badge}.png"
+        badge_path = BASE_DIR / "assets" / f"{badge.lower()}.png"
 
         with open(logo_path, "rb") as f:
             logo_base64 = base64.b64encode(f.read()).decode("utf-8")
@@ -195,7 +195,7 @@ class ResultPdfRenderer:
                 </table>
                 <div>
                     <span class="texto">O desenvolvimento do perfil sensorial vem com prática, <br />
-                      repertório e boas degustações guiadas. 🍷🍷</span>
+                      repertório e boas degustações guiadas. </span>
                 </div>
             </section>
 

@@ -11,6 +11,7 @@ from sqlalchemy import (
 from sqlalchemy.sql import func
 from app.core.db_types import GUID
 from app.core.database import Base
+from sqlalchemy.orm import relationship
 
 
 class ParticipantEvent(Base):

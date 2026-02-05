@@ -34,13 +34,13 @@ class Evaluation(Base):
 
     ## Avaliação Visual
     limpidity = Column(Enum(Limpidity, name="limpidity_enum"), nullable=False)
-    visualIntensity = Column(Integer, nullable=False)
+    visualIntensity = Column("visual_intensity", Integer, nullable=False)
     color_type = Column(Enum(ColorType, name="color_type_enum"), nullable=False)
     color_tone = Column(Enum(ColorTone, name="color_tone_enum"), nullable=False)
 
     ## Avaliação Olfativa
     condition = Column(Enum(Condition, name="condition_enum"), nullable=False)
-    aromaIntensity = Column(Integer, nullable=False)
+    aromaIntensity = Column("aroma_intensity", Integer, nullable=False)
     aromas = Column(String, nullable=True)
 
     ## Avaliação Gustativa
@@ -60,7 +60,7 @@ class Evaluation(Base):
 
     ## Common Fields
     is_answer_key = Column(Boolean, default=False, nullable=False)
-    score = Column(Integer, default=0, nullable=True)
+    score = Column(Integer, default=0, nullable=False)
 
     submitted_at = Column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
@@ -71,8 +71,8 @@ class Evaluation(Base):
 
     __table_args__ = (
         UniqueConstraint("participant_id", "round_id"),
-        CheckConstraint("visualIntensity BETWEEN 1 AND 5", name="ck_visual_intensity"),
-        CheckConstraint("aromaIntensity BETWEEN 1 AND 5", name="ck_aroma_intensity"),
+        CheckConstraint("visual_intensity BETWEEN 1 AND 5", name="ck_visual_intensity"),
+        CheckConstraint("aroma_intensity BETWEEN 1 AND 5", name="ck_aroma_intensity"),
         CheckConstraint("acidity BETWEEN 1 AND 5", name="ck_acidity"),
         CheckConstraint("consistence BETWEEN 1 AND 5", name="ck_consistence"),
         CheckConstraint("alcohol BETWEEN 1 AND 5", name="ck_alcohol"),

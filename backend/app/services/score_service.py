@@ -140,8 +140,11 @@ class ScoreService:
         for evaluation in evaluations:
             participant_score = ScoreService.calculate_score(evaluation, answer_key)
             evaluation.score = participant_score
+            db.add(evaluation)
 
-        round = db.query(Round).get(round_id)
+        db.flush()
+        # recalcula evento UMA vez, após todos os scores estarem atualizados
+        round = db.get(Round, round_id)
         if round:
             ScoreService.recalculate_event_totals(db, round.event_id)
 
