@@ -71,7 +71,7 @@ class ResultPdfRenderer:
             description = category.value["label"]
             is_current = key == badge
 
-            badge_img_path = BASE_DIR / "assets" / f"{key}.png"
+            badge_img_path = BASE_DIR / "assets" / f"{key.lower()}.png"
             with open(badge_img_path, "rb") as b:
                 badge_img_base64 = base64.b64encode(b.read()).decode("utf-8")
 
