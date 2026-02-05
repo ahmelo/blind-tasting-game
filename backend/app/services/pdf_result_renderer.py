@@ -16,9 +16,16 @@ class ResultPdfRenderer:
         percentual: int,
         badge: str,
     ) -> str:
-        BASE_DIR = Path(__file__).resolve().parent.parent
-        logo_path = BASE_DIR / "assets" / "logo_app.png"
-        badge_path = BASE_DIR / "assets" / f"{badge.lower()}.png"
+        BASE_DIR = Path(__file__).resolve().parent[1]
+        ASSETS_DIR = BASE_DIR / "assets"
+
+        logo_path = ASSETS_DIR / "logo_app.png"
+        badge_path = ASSETS_DIR / f"{badge.lower()}.png"
+
+        print("BASE_DIR:", BASE_DIR)
+        print("ASSETS_DIR:", ASSETS_DIR)
+        print("BADGE PATH:", badge_path)
+        print("EXISTS:", badge_path.exists())
 
         with open(logo_path, "rb") as f:
             logo_base64 = base64.b64encode(f.read()).decode("utf-8")
@@ -71,7 +78,7 @@ class ResultPdfRenderer:
             description = category.value["label"]
             is_current = key == badge
 
-            badge_img_path = BASE_DIR / "assets" / f"{key.lower()}.png"
+            badge_img_path = BASE_DIR / "assets" / f"{key}.png"
             with open(badge_img_path, "rb") as b:
                 badge_img_base64 = base64.b64encode(b.read()).decode("utf-8")
 
