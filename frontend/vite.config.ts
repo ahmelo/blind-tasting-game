@@ -15,7 +15,7 @@ export default defineConfig({
       ],
       manifest: {
         name: "Degustação às Cegas",
-        short_name: "Degustação",
+        short_name: "Savoir-Vin",
         description: "Jogo de degustação às cegas de vinhos - Savoir Vin",
         start_url: "/",
         display: "standalone",
