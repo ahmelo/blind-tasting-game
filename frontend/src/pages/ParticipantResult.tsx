@@ -78,7 +78,13 @@ export default function ParticipantResult({
       console.log("[ShareCard] Iniciando renderização do canvas");
       
       // Aguarda o badge estar carregado
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise((resolve) => {
+        const check = () => {
+          if ((shareCardRef.current as any)?.badgeReady) resolve(null);
+          else setTimeout(check, 50);
+        };
+        check();
+      });
 
       const canvas = await shareCardRef.current.toCanvas();
       console.log("[ShareCard] Canvas renderizado com sucesso");

@@ -8,12 +8,13 @@ interface ShareCardProps {
 }
 
 const BADGE_IMAGES: Record<string, string> = {
-    iniciante: "/badges/iniciante.png",
-    explorador: "/badges/explorador.png",
-    entusiasta: "/badges/entusiasta.png",
-    conhecedor: "/badges/conhecedor.png",
-    especialista: "/badges/especialista.png",
+  iniciante: `${import.meta.env.BASE_URL}badges/iniciante.png`,
+  explorador: `${import.meta.env.BASE_URL}badges/explorador.png`,
+  entusiasta: `${import.meta.env.BASE_URL}badges/entusiasta.png`,
+  conhecedor: `${import.meta.env.BASE_URL}badges/conhecedor.png`,
+  especialista: `${import.meta.env.BASE_URL}badges/especialista.png`,
 };
+
 
 export interface ShareCardHandle {
     toCanvas(): Promise<HTMLCanvasElement>;
@@ -30,7 +31,6 @@ const ShareCard = forwardRef<ShareCardHandle, ShareCardProps>(
       if (!badgeSrc) return;
 
       const img = new Image();
-      img.crossOrigin = "anonymous";
       img.src = badgeSrc;
       
       img.onload = () => {
@@ -43,6 +43,7 @@ const ShareCard = forwardRef<ShareCardHandle, ShareCardProps>(
     }, [badgeKey]);
 
     useImperativeHandle(ref, () => ({
+      badgeReady: !!badgeImage,
       toCanvas: async () => {
         const canvas = document.createElement("canvas");
         const ctx = canvas.getContext("2d");

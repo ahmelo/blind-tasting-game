@@ -16,7 +16,7 @@ class ResultPdfRenderer:
         percentual: int,
         badge: str,
     ) -> str:
-        BASE_DIR = Path(__file__).resolve().parent[1]
+        BASE_DIR = Path(__file__).resolve().parent.parent
         ASSETS_DIR = BASE_DIR / "assets"
 
         logo_path = ASSETS_DIR / "logo_app.png"
