@@ -50,7 +50,7 @@ class ResultPdfRenderer:
                         <tr>
                             <th>Item</th>
                             <th>Participante</th>
-                            <th>Gabarito</th>
+                            <th>Sommelier</th>
                         </tr>
                     </thead>
                     <tbody>
