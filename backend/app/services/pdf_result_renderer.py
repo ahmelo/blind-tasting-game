@@ -22,11 +22,6 @@ class ResultPdfRenderer:
         logo_path = ASSETS_DIR / "logo_app.png"
         badge_path = ASSETS_DIR / f"{badge.lower()}.png"
 
-        print("BASE_DIR:", BASE_DIR)
-        print("ASSETS_DIR:", ASSETS_DIR)
-        print("BADGE PATH:", badge_path)
-        print("EXISTS:", badge_path.exists())
-
         with open(logo_path, "rb") as f:
             logo_base64 = base64.b64encode(f.read()).decode("utf-8")
 
