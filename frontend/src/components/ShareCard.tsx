@@ -66,7 +66,7 @@ const ShareCard = forwardRef<ShareCardHandle, ShareCardProps>(
         ctx.fillText("🍷 Degustação às Cegas da Savoir-Vin", width / 2, 120);
 
         // Perfil sensorial
-        ctx.font = "36px Arial, sans-serif";
+        ctx.font = "64px Arial, sans-serif";
         ctx.fillStyle = "#CCCCCC";
         ctx.fillText("Meu perfil sensorial é", width / 2, 380);
 
@@ -80,25 +80,21 @@ const ShareCard = forwardRef<ShareCardHandle, ShareCardProps>(
         }
 
         // Score total
-        ctx.font = "36px Arial, sans-serif";
+        ctx.font = "48px Arial, sans-serif";
         ctx.fillStyle = "#CCCCCC";
-        ctx.fillText("", width / 2, 1350);
-
-        ctx.font = "36px Arial, sans-serif";
-        ctx.fillStyle = "#CCCCCC";
-        ctx.fillText(`Atingi ${totalScore} de ${maxTotalScore} pontos`, width / 2, 1450);
+        ctx.fillText(`Atingi ${totalScore} de ${maxTotalScore} pontos`, width / 2, 1350);
 
         // Aproveitamento
-        ctx.font = "36px Arial, sans-serif";
+        ctx.font = "64px Arial, sans-serif";
         ctx.fillStyle = "#CCCCCC";
-        ctx.fillText("Meu score foi de", width / 2, 1620);
+        ctx.fillText("Meu score foi de", width / 2, 1490);
 
-        ctx.font = "bold 64px Arial, sans-serif";
+        ctx.font = "bold 78px Arial, sans-serif";
         ctx.fillStyle = "#FFFFFF";
-        ctx.fillText(`${percentual.toFixed(2)}%`, width / 2, 1720);
+        ctx.fillText(`${percentual.toFixed(2)}%`, width / 2, 1620);
 
         // Footer
-        ctx.font = "32px Arial, sans-serif";
+        ctx.font = "36px Arial, sans-serif";
         ctx.fillStyle = "#999999";
         ctx.fillText("@savoir_vin", width / 2, 1850);
 
