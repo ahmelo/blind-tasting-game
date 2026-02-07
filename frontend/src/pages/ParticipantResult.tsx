@@ -3,6 +3,7 @@ import { apiDownload, apiGet } from "../api/client";
 import ShareCard, { type ShareCardHandle } from "../components/ShareCard";
 
 import "../styles/participant_result.css";
+import "../styles/share_card.css"
 import type { EvaluationResultResponse } from "../types/results";
 
 interface ParticipantResultProps {
@@ -66,7 +67,7 @@ export default function ParticipantResult({
   const handleDownloadPdf = async () => {
     try {
       setDownloadingPdf(true);
-      await apiDownload("/results/pdf", "resultado-avaliacao.pdf");
+      await apiDownload("/results/pdf", "Resultado-avaliacao.pdf");
     } catch (err) {
       console.error(err);
       alert("Não foi possível gerar o PDF");

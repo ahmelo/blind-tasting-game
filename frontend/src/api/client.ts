@@ -22,8 +22,13 @@ export async function apiPost<TReq, TRes>(path: string, body: TReq): Promise<TRe
     }
 
     return res.json() as Promise<TRes>;
-  } catch (err) {
-    throw new NetworkError();
+  } catch (err: any) {
+    // `fetch` throws a `TypeError` for network-level failures (CORS, offline, refused connection).
+    // Preserve HTTP / application errors (thrown above when !res.ok) so callers can handle them.
+    if (err instanceof TypeError) {
+      throw new NetworkError();
+    }
+    throw err;
   }
 }
 
@@ -51,9 +56,11 @@ export async function apiGet<TRes>(path: string): Promise<TRes> {
     }
 
     return res.json() as Promise<TRes>;
-  } catch (err) {
-    // aqui pegamos *qualquer* erro de rede
-    throw new NetworkError();
+  } catch (err: any) {
+    if (err instanceof TypeError) {
+      throw new NetworkError();
+    }
+    throw err;
   }
 }
 
@@ -76,8 +83,11 @@ export async function apiPatch<TReq, TRes>(path: string, body: TReq): Promise<TR
     }
 
     return res.json() as Promise<TRes>;
-  } catch (err) {
-    throw new NetworkError();
+  } catch (err: any) {
+    if (err instanceof TypeError) {
+      throw new NetworkError();
+    }
+    throw err;
   }
 }
 
@@ -93,8 +103,11 @@ export async function apiDelete(path: string): Promise<void> {
       const text = await res.text();
       throw new Error(text || `HTTP ${res.status}`);
     }
-  } catch (err) {
-    throw new NetworkError();
+  } catch (err: any) {
+    if (err instanceof TypeError) {
+      throw new NetworkError();
+    }
+    throw err;
   }
 }
 
@@ -138,6 +151,9 @@ export async function apiDownload(
     link.remove();
     window.URL.revokeObjectURL(url);
   } catch (err) {
-    throw new NetworkError();
+    if (err instanceof TypeError) {
+      throw new NetworkError();
+    }
+    throw err;
   }
 }

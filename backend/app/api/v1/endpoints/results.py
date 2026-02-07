@@ -55,7 +55,7 @@ def export_my_result_pdf(
     return Response(
         pdf,
         media_type="application/pdf",
-        headers={"Content-Disposition": "attachment; filename=resultado-avaliacao.pdf"},
+        headers={"Content-Disposition": "attachment; filename=Resultado-avaliacao.pdf"},
     )
 
 
