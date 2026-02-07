@@ -102,6 +102,7 @@ const grapeOptions: Grape[] = [
   "Barbera",
   "Cabernet Franc",
   "Cabernet Sauvignon",
+  "Carménère",
   "Chardonnay",
   "Chenin Blanc",
   "Colombard",

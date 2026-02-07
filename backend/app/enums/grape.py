@@ -6,6 +6,7 @@ class Grape(str, Enum):
     barbera = "Barbera"
     cabernet_franco = "Cabernet Franc"
     cabernet_sauvignon = "Cabernet Sauvignon"
+    carmenere = "Caménère"
     chardonnay = "Chardonnay"
     chenin_blanc = "Chenin Blanc"
     colombard = "Colombard"
