@@ -53,16 +53,19 @@ export default function Winner({ eventId }: WinnerProps) {
             <div key={winner.participant_id} style={{ marginBottom: 8 }}>
               <strong>{winner.participant_name}</strong>
               <div style={{ fontSize: 16 }}>
-                Score: {winner.total_score}
+                Score: {winner.participant_percentual}%
               </div>
             </div>
-          ))}
-        </div>
-      )}
-
-      {!loading && !error && winners.length === 0 && (
-        <p>Nenhum vencedor encontrado.</p>
-      )}
+      ))}
     </div>
+  )
+}
+
+{
+  !loading && !error && winners.length === 0 && (
+    <p>Nenhum vencedor encontrado.</p>
+  )
+}
+    </div >
   );
 }

@@ -14,6 +14,7 @@ from app.enums.country import Country
 class EventWinnerResponse(BaseModel):
     participant_id: UUID
     participant_name: str
+    participant_percentual: float
     total_score: int
 
     class Config:
@@ -24,6 +25,7 @@ class EventRankingResponse(BaseModel):
     position: int
     participant_id: UUID
     participant_name: str
+    participant_percentual: float
     total_score: int
 
     class Config:

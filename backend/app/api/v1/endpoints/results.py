@@ -39,6 +39,7 @@ def export_my_result_pdf(
         participant_name=participant.name,
         results=results,
         score_total=pe.score_total,
+        score_max_total=pe.score_max_total,
         percentual=pe.percentual,
         badge=pe.badge,
     )

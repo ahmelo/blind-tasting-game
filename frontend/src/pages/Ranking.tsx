@@ -51,7 +51,7 @@ export default function Ranking({ eventId }: RankingProps) {
               >
                 <td style={{ padding: 6 }}>{r.position}</td>
                 <td style={{ padding: 6 }}>{r.participant_name}</td>
-                <td style={{ padding: 6 }}>{r.total_score}</td>
+                <td style={{ padding: 6 }}>{r.participant_percentual}%</td>
               </tr>
             ))}
           </tbody>

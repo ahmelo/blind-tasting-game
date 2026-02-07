@@ -13,6 +13,7 @@ class ResultPdfRenderer:
         participant_name: str,
         results: list[dict],
         score_total: int,
+        score_max_total:int,
         percentual: int,
         badge: str,
     ) -> str:
@@ -177,8 +178,8 @@ class ResultPdfRenderer:
                 <div class="header-text">
                     <h1>{r['event_name']}</h1>
                     <h3 class="total-score">Parabéns <strong>{participant_name}!</strong></h3>
-                    <h3 class="total-score">Você atingiu um total de {score_total} pontos</h3>
-                    <h3 class="total-score">O que corresponde a {percentual}% do total</h3>
+                    <h3 class="total-score">O seu score é {percentual}%.</h3>
+                    <h3 class="total-score">Você atingiu {score_total} de um total de {score_max_total} pontos.</h3>
                     <h3 class="total-score">Seu perfil sensorial é {badge}</h3>
                 </div>
                 <div class="header-logo">

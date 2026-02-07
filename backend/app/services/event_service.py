@@ -4,6 +4,7 @@ from app.models.evaluation import Evaluation
 from sqlalchemy import desc
 from app.models.round import Round
 from app.models.participant import Participant
+from app.models.participant_event import ParticipantEvent
 from uuid import UUID
 from app.models.event import Event
 
@@ -16,12 +17,14 @@ class EventService:
             db.query(
                 Participant.id.label("participant_id"),
                 Participant.name.label("participant_name"),
+                ParticipantEvent.percentual.label("participant_percentual"),
                 func.sum(Evaluation.score).label("total_score"),
             )
             .join(Evaluation, Evaluation.participant_id == Participant.id)
             .join(Round, Round.id == Evaluation.round_id)
+            .join(ParticipantEvent, ParticipantEvent.participant_id == Participant.id)
             .filter(Round.event_id == event_id, Evaluation.is_answer_key.is_(False))
-            .group_by(Participant.id, Participant.name)
+            .group_by(Participant.id, Participant.name, ParticipantEvent.percentual)
             .order_by(func.sum(Evaluation.score).desc())
             .limit(3)
             .all()
@@ -33,7 +36,7 @@ class EventService:
         last_score = None
 
         for row in results:
-            participant_id, participant_name, total_score = row
+            participant_id, participant_name, participant_percentual, total_score = row
 
             if last_score is None or total_score < last_score:
                 current_position += 1
@@ -44,6 +47,7 @@ class EventService:
                     "position": current_position,
                     "participant_id": participant_id,
                     "participant_name": participant_name,
+                    "participant_percentual": participant_percentual,
                     "total_score": total_score,
                 }
             )

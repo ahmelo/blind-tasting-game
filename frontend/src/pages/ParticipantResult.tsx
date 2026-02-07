@@ -18,6 +18,8 @@ export default function ParticipantResult({
   const [openBlock, setOpenBlock] = useState<string | null>(null);
 
   const [totalScore, setTotalScore] = useState<number | null>(null);
+  const [scoreMaxTotal, setScoreMaxTotal] = useState<number | null>(null);
+
   const [loadingScore, setLoadingScore] = useState(false);
   const [percentual, setPercentual] = useState<number | null>(null);
   const [badge, setBadge] = useState<string | null>(null);
@@ -40,12 +42,14 @@ export default function ParticipantResult({
       try {
         const res = await apiGet<{
           total_score: number;
+          score_max_total: number;
           percentual: number;
           badge: string;
           badge_key: string;
         }>("/results/my-event");
 
         setTotalScore(res.total_score);
+        setScoreMaxTotal(res.score_max_total);
         setPercentual(res.percentual);
         setBadge(res.badge);
         setBadgeKey(res.badge_key)
@@ -76,7 +80,7 @@ export default function ParticipantResult({
 
     try {
       console.log("[ShareCard] Iniciando renderização do canvas");
-      
+
       // Aguarda o badge estar carregado
       await new Promise((resolve) => {
         const check = () => {
@@ -142,14 +146,15 @@ export default function ParticipantResult({
         {totalScore !== null && (
           <div>
             <div className="score-highlight">
-              <span className="score-label">Meu score total é</span>
-              <span className="score-value">{totalScore}</span>
-              <span className="score-label">pontos</span>
+              <span className="score-label">Meu score é</span>
+              <span className="score-value">{percentual?.toFixed(2)}%</span>
             </div>
             <div className="score-highlight">
               <span className="score-label">Atingi </span>
-              <span className="score-value">{percentual?.toFixed(2)}%</span>
-              <span className="score-label">dos pontos</span>
+              <span className="score-value">{totalScore}</span>
+              <span className="score-label">de um total de</span>
+              <span className="score-value">{scoreMaxTotal}</span>
+              <span className="score-label">pontos</span>
             </div>
             <div className="score-highlight">
               <span className="score-label">Meu perfil sensorial é: </span>
@@ -305,11 +310,13 @@ export default function ParticipantResult({
 
       {totalScore !== null &&
         percentual !== null &&
+        scoreMaxTotal !== null &&
         badge &&
         badgeKey && (
           <ShareCard
             ref={shareCardRef}
             totalScore={totalScore}
+            maxTotalScore={scoreMaxTotal}
             percentual={percentual}
             badge={badge}
             badgeKey={badgeKey}

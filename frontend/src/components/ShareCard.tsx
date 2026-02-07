@@ -2,6 +2,7 @@ import { forwardRef, useImperativeHandle, useRef, useEffect, useState } from "re
 
 interface ShareCardProps {
     totalScore: number;
+    maxTotalScore: number;
     percentual: number;
     badge: string;
     badgeKey: string;
@@ -21,7 +22,7 @@ export interface ShareCardHandle {
 }
 
 const ShareCard = forwardRef<ShareCardHandle, ShareCardProps>(
-  ({ totalScore, percentual, badgeKey }, ref) => {
+  ({ totalScore, maxTotalScore, percentual, badgeKey }, ref) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [badgeImage, setBadgeImage] = useState<HTMLImageElement | null>(null);
 
@@ -81,16 +82,16 @@ const ShareCard = forwardRef<ShareCardHandle, ShareCardProps>(
         // Score total
         ctx.font = "36px Arial, sans-serif";
         ctx.fillStyle = "#CCCCCC";
-        ctx.fillText("Meu score total foi", width / 2, 1350);
+        ctx.fillText("", width / 2, 1350);
 
-        ctx.font = "bold 64px Arial, sans-serif";
-        ctx.fillStyle = "#FFFFFF";
-        ctx.fillText(`${totalScore} pontos`, width / 2, 1450);
+        ctx.font = "36px Arial, sans-serif";
+        ctx.fillStyle = "#CCCCCC";
+        ctx.fillText(`Atingi ${totalScore} de ${maxTotalScore} pontos`, width / 2, 1450);
 
         // Aproveitamento
         ctx.font = "36px Arial, sans-serif";
         ctx.fillStyle = "#CCCCCC";
-        ctx.fillText("Com aproveitamento de", width / 2, 1620);
+        ctx.fillText("Meu score foi de", width / 2, 1620);
 
         ctx.font = "bold 64px Arial, sans-serif";
         ctx.fillStyle = "#FFFFFF";
