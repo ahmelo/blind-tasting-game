@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { apiGet, apiPost } from "../api/client";
+import { storage, type EvaluationDraft } from "../utils/storage";
 import "../styles/evaluation.css";
 import type {
   ColorType,
@@ -238,6 +239,7 @@ export default function Evaluation({ participantId, eventId, initialIsAnswerKey,
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [waiting, setWaiting] = useState(false);
+  const [draftInfo, setDraftInfo] = useState<string | null>(null);
 
   const toneOptions = useMemo(
     () => (colorType ? TONES[colorType] : []),
@@ -291,13 +293,99 @@ export default function Evaluation({ participantId, eventId, initialIsAnswerKey,
   }
   useEffect(() => {
     loadPendingRound();
+    
+    // Tentar restaurar rascunho salvo anteriormente
+    const draft = storage.getEvaluationDraft();
+    if (draft) {
+      setDraftInfo(`Rascunho anterior encontrado para ${draft.roundName}. Dados restaurados!`);
+      setLimpidity(draft.data.limpidity as Limpidity | null);
+      setVisualIntensity(draft.data.visualIntensity);
+      setColorType(draft.data.colorType as ColorType | null);
+      setColorTone(draft.data.colorTone);
+      setCondition(draft.data.condition as Condition | null);
+      setAromaIntensity(draft.data.aromaIntensity);
+      setAromas(draft.data.aromas);
+      setSweetness(draft.data.sweetness as Sweetness | null);
+      setTannin(draft.data.tannin);
+      setAlcohol(draft.data.alcohol);
+      setConsistence(draft.data.consistence);
+      setAcidity(draft.data.acidity);
+      setPersistence(draft.data.persistence);
+      setFlavors(draft.data.flavors);
+      setQuality(draft.data.quality as Quality | null);
+      setGrape(draft.data.grape as Grape | null);
+      setCountry(draft.data.country as Country | null);
+      setVintage(draft.data.vintage);
+      setIsAnswerKey(draft.data.isAnswerKey);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (!roundId || roundName === null) return;
+
+    // Salvar rascunho em localStorage sempre que qualquer campo muda
+    const draft: EvaluationDraft = {
+      eventId,
+      roundId,
+      roundName,
+      participantId,
+      data: {
+        limpidity,
+        visualIntensity,
+        colorType,
+        colorTone,
+        condition,
+        aromaIntensity,
+        aromas,
+        sweetness,
+        tannin,
+        alcohol,
+        consistence,
+        acidity,
+        persistence,
+        flavors,
+        quality,
+        grape,
+        country,
+        vintage,
+        isAnswerKey,
+      },
+      timestamp: Date.now(),
+    };
+
+    storage.saveEvaluationDraft(draft);
+  }, [
+    eventId,
+    participantId,
+    roundId,
+    roundName,
+    limpidity,
+    visualIntensity,
+    colorType,
+    colorTone,
+    condition,
+    aromaIntensity,
+    aromas,
+    sweetness,
+    tannin,
+    alcohol,
+    consistence,
+    acidity,
+    persistence,
+    flavors,
+    quality,
+    grape,
+    country,
+    vintage,
+    isAnswerKey,
+  ]);
 
   useEffect(() => {
     if (roundId) {
       resetForm();
       setCanCloseRound(false);
+      setDraftInfo(null);  // Limpar mensagem de rascunho quando novo round carrega
       // Scroll para o topo após o novo round ser carregado
       requestAnimationFrame(() => {
         scrollToTop(scrollableRef);
@@ -452,6 +540,9 @@ export default function Evaluation({ participantId, eventId, initialIsAnswerKey,
         EvaluationResponse
       >("/evaluations", payload);
 
+      // Limpar rascunho após envio bem-sucedido
+      storage.clearEvaluationDraft();
+
       if (isAnswerKey) {
         setCanCloseRound(true);
       } else {
@@ -503,6 +594,21 @@ export default function Evaluation({ participantId, eventId, initialIsAnswerKey,
       {loading && (
         <div className="loading-overlay">
           <p>Enviando avaliação...</p>
+        </div>
+      )}
+
+      {draftInfo && (
+        <div className="alert alert-info" role="alert" aria-live="polite">
+          <span>{draftInfo}</span>
+          <button
+            type="button"
+            className="alert-close"
+            onClick={() => setDraftInfo(null)}
+            aria-label="Fechar mensagem"
+            title="Fechar"
+          >
+            ×
+          </button>
         </div>
       )}
 

@@ -215,6 +215,12 @@
   color: #14532d;
 }
 
+.alert-info {
+  border-color: rgba(37, 99, 235, .22);
+  background: rgba(37, 99, 235, .07);
+  color: #1e40af;
+}
+
 /* Skeleton simples */
 .skeleton {
   height: 12px;
