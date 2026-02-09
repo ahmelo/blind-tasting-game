@@ -2,7 +2,16 @@ import { useEffect, useState } from "react";
 import { apiGet, apiPost, apiPatch, apiDelete } from "../api/client";
 
 type EventItem = { id: string; name: string; access_code?: string; is_open: boolean };
-type RoundItem = { id: string; name: string; position: number; is_open: boolean; event_id: string };
+type RoundItem = {
+  id: string;
+  name: string;
+  position: number;
+  is_open: boolean;
+  event_id: string;
+  wine_grapes?: string[] | null;
+  wine_country?: string | null;
+  wine_vintage?: number | null;
+};
 
 export default function Rounds({ onBack }: { onBack: () => void }) {
   const [events, setEvents] = useState<EventItem[]>([]);
@@ -13,6 +22,9 @@ export default function Rounds({ onBack }: { onBack: () => void }) {
 
   const [newName, setNewName] = useState("");
   const [newPosition, setNewPosition] = useState<number | undefined>(undefined);
+  const [newWineGrapes, setNewWineGrapes] = useState("");
+  const [newWineCountry, setNewWineCountry] = useState("");
+  const [newWineVintage, setNewWineVintage] = useState<number | undefined>(undefined);
 
   const [editing, setEditing] = useState<{ [id: string]: boolean }>({});
   const [editValues, setEditValues] = useState<{ [id: string]: { name?: string; position?: number; is_open?: boolean } }>(
@@ -58,13 +70,22 @@ export default function Rounds({ onBack }: { onBack: () => void }) {
     }
     setError("");
     try {
-      const res = await apiPost<{ name: string; position?: number; event_id: string }, RoundItem>("/rounds", {
+      const res = await apiPost<
+        { name: string; position?: number; event_id: string; wine_grapes?: string[]; wine_country?: string; wine_vintage?: number },
+        RoundItem
+      >("/rounds", {
         name: newName,
         position: newPosition,
         event_id: selectedEvent,
+        wine_grapes: newWineGrapes ? newWineGrapes.split(",").map((s) => s.trim()).filter(Boolean) : undefined,
+        wine_country: newWineCountry || undefined,
+        wine_vintage: newWineVintage,
       });
       setNewName("");
       setNewPosition(undefined);
+      setNewWineGrapes("");
+      setNewWineCountry("");
+      setNewWineVintage(undefined);
       setRounds((s) => [res, ...s]);
     } catch (err: any) {
       setError(err?.message ?? "Erro ao criar round");
@@ -195,6 +216,46 @@ export default function Rounds({ onBack }: { onBack: () => void }) {
                 value={newPosition ?? ""}
                 onChange={(e) => setNewPosition(e.target.value ? Number(e.target.value) : undefined)}
                 placeholder="Ex.: 1"
+              />
+            </div>
+
+            <div className="field">
+              <label className="label" htmlFor="roundGrapes">
+                Uvas (separadas por vírgula)
+              </label>
+              <input
+                id="roundGrapes"
+                className="input"
+                value={newWineGrapes}
+                onChange={(e) => setNewWineGrapes(e.target.value)}
+                placeholder="Ex.: Malbec, Syrah"
+              />
+            </div>
+
+            <div className="field">
+              <label className="label" htmlFor="roundCountry">
+                País (opcional)
+              </label>
+              <input
+                id="roundCountry"
+                className="input"
+                value={newWineCountry}
+                onChange={(e) => setNewWineCountry(e.target.value)}
+                placeholder="Ex.: Argentina"
+              />
+            </div>
+
+            <div className="field">
+              <label className="label" htmlFor="roundVintage">
+                Safra (opcional)
+              </label>
+              <input
+                id="roundVintage"
+                className="input"
+                type="number"
+                value={newWineVintage ?? ""}
+                onChange={(e) => setNewWineVintage(e.target.value ? Number(e.target.value) : undefined)}
+                placeholder="Ex.: 2018"
               />
             </div>
 

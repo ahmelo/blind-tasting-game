@@ -136,6 +136,8 @@ export default function EventAnswerKey({
   const [items, setItems] = useState<AnswerKeyItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [openRound, setOpenRound] = useState<string | null>(null);
+  const [openBlock, setOpenBlock] = useState<string | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -162,135 +164,117 @@ export default function EventAnswerKey({
     <div className="answer-key-container">
       <h2 className="answer-key-title">Gabarito do Evento</h2>
 
-      {items.map((ev) => (
-        <div key={ev.round_id} className="answer-key-round">
-          <h4>
-            {ev.round_name}
-          </h4>
+      {items.map((ev) => {
+        const roundOpen = openRound === ev.round_id;
 
-          {/* Avaliação Visual */}
-          <fieldset className="answer-key-group">
-            <legend className="answer-key-group-title">Avaliação Visual</legend>
+        const makeBlock = (key: string, label: string, rows: { label: string; value: string }[]) => ({ key, label, rows });
 
-            <div className="answer-key-field">
-              <span className="answer-key-label">Limpidez:</span>
-              <span className="answer-key-value">{getLabelForValue(limpidityOptions, ev.limpidity)}</span>
+        const visualRows = [
+          { label: "Limpidez", value: getLabelForValue(limpidityOptions, ev.limpidity) },
+          { label: "Intensidade", value: getLabelForValue(intensityOptions, ev.visualIntensity) },
+          { label: "Cor", value: getLabelForValue(colorTypeOptions, ev.color_type) },
+          { label: "Tom", value: getToneLabel(ev.color_type, ev.color_tone) },
+        ];
+
+        const olfactiveRows = [
+          { label: "Condição", value: getLabelForValue(conditionOptions, ev.condition) },
+          { label: "Intensidade", value: getLabelForValue(intensityOptions, ev.aromaIntensity) },
+          { label: "Aromas", value: ev.aromas ?? "-" },
+        ];
+
+        const gustativeRows = [
+          { label: "Doçura", value: getLabelForValue(sweetnessOptions, ev.sweetness) },
+          ...(ev.color_type !== "branco" && ev.tannin != null ? [{ label: "Taninos", value: getLabelForValue(intensityOptions2, ev.tannin) }] : []),
+          { label: "Álcool", value: getLabelForValue(intensityOptions2, ev.alcohol) },
+          { label: "Corpo", value: getLabelForValue(intensityOptions2, ev.consistence) },
+          { label: "Acidez", value: getLabelForValue(intensityOptions, ev.acidity) },
+          { label: "Final", value: getLabelForValue(intensityOptions3, ev.persistence) },
+          { label: "Sabores", value: ev.flavors ?? "-" },
+        ];
+
+        const generalRows = [
+          { label: "Qualidade", value: getLabelForValue(qualityOptions, ev.quality) },
+          ...(ev.grape ? [{ label: "Uva", value: ev.grape }] : []),
+          ...(ev.country ? [{ label: "País", value: ev.country }] : []),
+          ...(ev.vintage ? [{ label: "Safra", value: String(ev.vintage) }] : []),
+        ];
+
+        const blocks = [
+          makeBlock("visual", "Avaliação Visual", visualRows),
+          makeBlock("olfactive", "Avaliação Olfativa", olfactiveRows),
+          makeBlock("gustative", "Avaliação Gustativa", gustativeRows),
+          makeBlock("general", "Informações Adicionais", generalRows),
+        ];
+
+        return (
+          <div key={ev.round_id} className="round-card">
+            <div
+              className="round-header"
+              onClick={() => setOpenRound(roundOpen ? null : ev.round_id)}
+            >
+              <div>
+                <h3>{ev.round_name}</h3>
+              </div>
+              <span className="round-toggle">{roundOpen ? "▲" : "▼"}</span>
             </div>
 
-            <div className="answer-key-field">
-              <span className="answer-key-label">Intensidade:</span>
-              <span className="answer-key-value">{getLabelForValue(intensityOptions, ev.visualIntensity)}</span>
-            </div>
+            {roundOpen && (
+              <div className="round-content">
+                {blocks.map((block) => {
+                  const blockKey = `${ev.round_id}-${block.key}`;
+                  const blockOpen = openBlock === blockKey;
 
-            <div className="answer-key-field">
-              <span className="answer-key-label">Cor:</span>
-              <span className="answer-key-value">{getLabelForValue(colorTypeOptions, ev.color_type)}</span>
-            </div>
+                  return (
+                    <div key={block.key} className="block-card">
+                      <div
+                        className="block-header"
+                        onClick={() => setOpenBlock(blockOpen ? null : blockKey)}
+                      >
+                        <span className="block-title">{block.label}</span>
+                        <span className="block-toggle">{blockOpen ? "−" : "+"}</span>
+                      </div>
 
-            <div className="answer-key-field">
-              <span className="answer-key-label">Tom:</span>
-              <span className="answer-key-value">{getToneLabel(ev.color_type, ev.color_tone)}</span>
-            </div>
-          </fieldset>
+                      {blockOpen && (
+                        <div className="block-content">
+                          <table className="result-table desktop-only">
+                            <thead>
+                              <tr>
+                                <th>Campo</th>
+                                <th>Resposta (Sommelier)</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {block.rows.map((row, idx) => (
+                                <tr key={idx}>
+                                  <td>{row.label}</td>
+                                  <td>{row.value}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
 
-          {/* Avaliação Olfativa */}
-          <fieldset className="answer-key-group">
-            <legend className="answer-key-group-title">Avaliação Olfativa</legend>
-
-            <div className="answer-key-field">
-              <span className="answer-key-label">Condição:</span>
-              <span className="answer-key-value">{getLabelForValue(conditionOptions, ev.condition)}</span>
-            </div>
-
-            <div className="answer-key-field">
-              <span className="answer-key-label">Intensidade:</span>
-              <span className="answer-key-value">{getLabelForValue(intensityOptions, ev.aromaIntensity)}</span>
-            </div>
-
-            <div className="answer-key-field">
-              <span className="answer-key-label">Aromas:</span>
-              <span className="answer-key-value">
-                {ev.aromas ? ev.aromas : <span className="answer-key-empty">Não informado</span>}
-              </span>
-            </div>
-          </fieldset>
-
-          {/* Avaliação Gustativa */}
-          <fieldset className="answer-key-group">
-            <legend className="answer-key-group-title">Avaliação Gustativa</legend>
-
-            <div className="answer-key-field">
-              <span className="answer-key-label">Doçura:</span>
-              <span className="answer-key-value">{getLabelForValue(sweetnessOptions, ev.sweetness)}</span>
-            </div>
-
-            {ev.color_type !== "branco" && ev.tannin != null && (
-              <div className="answer-key-field">
-                <span className="answer-key-label">Taninos:</span>
-                <span className="answer-key-value">{getLabelForValue(intensityOptions2, ev.tannin)}</span>
+                          <div className="mobile-only">
+                            {block.rows.map((row, idx) => (
+                              <div key={idx} className="mobile-result-item">
+                                <div className="mobile-item-header">
+                                  <span className="mobile-item-label">{row.label}</span>
+                                </div>
+                                <div className="mobile-item-row">
+                                  <strong>{row.value}</strong>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             )}
-
-            <div className="answer-key-field">
-              <span className="answer-key-label">Álcool:</span>
-              <span className="answer-key-value">{getLabelForValue(intensityOptions2, ev.alcohol)}</span>
-            </div>
-
-            <div className="answer-key-field">
-              <span className="answer-key-label">Corpo:</span>
-              <span className="answer-key-value">{getLabelForValue(intensityOptions2, ev.consistence)}</span>
-            </div>
-
-            <div className="answer-key-field">
-              <span className="answer-key-label">Acidez:</span>
-              <span className="answer-key-value">{getLabelForValue(intensityOptions, ev.acidity)}</span>
-            </div>
-
-            <div className="answer-key-field">
-              <span className="answer-key-label">Final:</span>
-              <span className="answer-key-value">{getLabelForValue(intensityOptions3, ev.persistence)}</span>
-            </div>
-
-            <div className="answer-key-field">
-              <span className="answer-key-label">Sabores:</span>
-              <span className="answer-key-value">
-                {ev.flavors ? ev.flavors : <span className="answer-key-empty">Não informado</span>}
-              </span>
-            </div>
-          </fieldset>
-
-          {/* Informações Adicionais */}
-          <fieldset className="answer-key-group">
-            <legend className="answer-key-group-title">Informações Adicionais</legend>
-
-            <div className="answer-key-field">
-              <span className="answer-key-label">Qualidade:</span>
-              <span className="answer-key-value">{getLabelForValue(qualityOptions, ev.quality)}</span>
-            </div>
-
-            {ev.grape && (
-              <div className="answer-key-field">
-                <span className="answer-key-label">Uva:</span>
-                <span className="answer-key-value">{ev.grape}</span>
-              </div>
-            )}
-
-            {ev.country && (
-              <div className="answer-key-field">
-                <span className="answer-key-label">País:</span>
-                <span className="answer-key-value">{ev.country}</span>
-              </div>
-            )}
-
-            {ev.vintage && (
-              <div className="answer-key-field">
-                <span className="answer-key-label">Safra:</span>
-                <span className="answer-key-value">{ev.vintage}</span>
-              </div>
-            )}
-          </fieldset>
-        </div>
-      ))}
+          </div>
+        );
+      })}
 
       <button className="btn btn-ghost answer-key-back-button" onClick={onBack}>
         Voltar

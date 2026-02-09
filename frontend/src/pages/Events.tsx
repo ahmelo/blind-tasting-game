@@ -16,7 +16,6 @@ export default function Events({
   onBack: () => void;
   onViewResult: (eventId: string) => void;
   onViewAnswerKey: (eventId: string) => void;
-
 }) {
   const [events, setEvents] = useState<EventItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -75,7 +74,6 @@ export default function Events({
         <input value={newName} onChange={(e) => setNewName(e.target.value)} className="input" placeholder="Nome" />
         <input value={newCode} onChange={(e) => setNewCode(e.target.value)} className="input" placeholder="Código" />
         <button className="btn btn-primary">Criar</button>
-
       </form>
 
       {loading && <p>Carregando…</p>}

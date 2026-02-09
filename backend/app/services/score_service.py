@@ -1,6 +1,7 @@
 from app.models.evaluation import Evaluation
 from app.models.participant_event import ParticipantEvent
 from app.models.round import Round  # ajuste import conforme seu projeto
+from app.models.wine import Wine
 from decimal import Decimal, ROUND_HALF_UP
 from sqlalchemy import func
 from sqlalchemy.orm import Session
@@ -35,7 +36,7 @@ class ScoreService:
             return "partial"
 
     @staticmethod
-    def calculate_score(evaluation: Evaluation, answer_key: Evaluation) -> int:
+    def calculate_score(evaluation: Evaluation, answer_key: Evaluation, db: Session = None, round_id = None) -> int:
         score = 0
 
         if evaluation.limpidity == answer_key.limpidity:
@@ -98,8 +99,18 @@ class ScoreService:
         if evaluation.quality == answer_key.quality:
             score += Score.normal.value
 
-        if evaluation.grape is not None and evaluation.grape == answer_key.grape:
-            score += Score.uva.value
+        # Verificar se a uva está na lista de uvas do Wine
+        if evaluation.grape is not None:
+            if db and round_id:
+                wine = db.query(Wine).filter(Wine.round_id == round_id).first()
+                if wine and wine.grapes:
+                    # Comparar se a uva do participante está na lista de uvas do Wine
+                    grape_value = evaluation.grape.value if hasattr(evaluation.grape, 'value') else str(evaluation.grape)
+                    if grape_value in wine.grapes:
+                        score += Score.uva.value
+            elif evaluation.grape == answer_key.grape:
+                # Fallback para compatibilidade: comparar com gabarito se não houver Wine
+                score += Score.uva.value
 
         if evaluation.country is not None and evaluation.country == answer_key.country:
             score += Score.pais.value
@@ -138,7 +149,7 @@ class ScoreService:
         )
 
         for evaluation in evaluations:
-            participant_score = ScoreService.calculate_score(evaluation, answer_key)
+            participant_score = ScoreService.calculate_score(evaluation, answer_key, db=db, round_id=round_id)
             evaluation.score = participant_score
             db.add(evaluation)
 
@@ -153,8 +164,8 @@ class ScoreService:
 
     @staticmethod
     def calculate_score_absolute(answer_key: Evaluation) -> int:
-        # compara o gabarito consigo mesmo
-        return ScoreService.calculate_score(answer_key, answer_key)
+        # compara o gabarito consigo mesmo (sem parâmetros db/round_id)
+        return ScoreService.calculate_score(answer_key, answer_key, db=None, round_id=None)
 
     @staticmethod
     def calculate_percentage(participant_score: int, score_absolute: int) -> float:

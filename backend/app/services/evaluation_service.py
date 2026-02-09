@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import func
 from app.models.round import Round
+from app.models.wine import Wine
 
 from app.models.evaluation import Evaluation
 from app.services.score_service import ScoreService
@@ -29,6 +30,30 @@ class EvaluationService:
         db: Session,
         payload: EvaluationCreate
     ) -> Evaluation:
+        # Se for gabarito, pré-preencher dados do Wine
+        grape = payload.grape
+        country = payload.country
+        vintage = payload.vintage
+        
+        if payload.is_answer_key:
+            wine = db.query(Wine).filter(Wine.round_id == payload.round_id).first()
+            if wine:
+                # Usar informações do Wine se disponíveis
+                if wine.grapes:
+                    # Se houver múltiplas uvas, usar a primeira (ou a que foi passada)
+                    if not grape:
+                        # Pegar o valor do enum correto
+                        from app.enums.grape import Grape
+                        # Tenta encontrar a primeira uva que existe no enum
+                        for grape_obj in Grape:
+                            if grape_obj.value in wine.grapes:
+                                grape = grape_obj
+                                break
+                if wine.country:
+                    country = wine.country
+                if wine.vintage:
+                    vintage = wine.vintage
+        
         evaluation = Evaluation(
             participant_id=payload.participant_id,
             round_id=payload.round_id,
@@ -48,9 +73,9 @@ class EvaluationService:
             persistence=payload.persistence,
             flavors=payload.flavors,
             quality=payload.quality,
-            grape=payload.grape,
-            country=payload.country,
-            vintage=payload.vintage
+            grape=grape,
+            country=country,
+            vintage=vintage
         )
 
         try:
@@ -68,7 +93,9 @@ class EvaluationService:
                 if answer_key:
                     evaluation.score = ScoreService.calculate_score(
                         evaluation,
-                        answer_key
+                        answer_key,
+                        db=db,
+                        round_id=evaluation.round_id
                     )
                     db.commit()
                     db.refresh(evaluation)

@@ -235,6 +235,7 @@ export default function Evaluation({ participantId, eventId, initialIsAnswerKey,
   const [grape, setGrape] = useState<Grape | null>(null);
   const [country, setCountry] = useState<Country | null>(null);
   const [vintage, setVintage] = useState<string | null>(null);
+  const [wineGrapesList, setWineGrapesList] = useState<string[] | null>(null);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -246,7 +247,7 @@ export default function Evaluation({ participantId, eventId, initialIsAnswerKey,
     [colorType]
   );
 
-  function resetForm() {
+  function resetForm(keepWine = false) {
     setLimpidity(null);
     setVisualIntensity(null);
     setColorType(null);
@@ -262,9 +263,12 @@ export default function Evaluation({ participantId, eventId, initialIsAnswerKey,
     setPersistence(null);
     setFlavors(null);
     setQuality(null);
-    setGrape(null);
-    setCountry(null);
-    setVintage(null);
+    if (!keepWine) {
+      setGrape(null);
+      setCountry(null);
+      setVintage(null);
+      setWineGrapesList(null);
+    }
   }
 
   function isEvaluationComplete() {
@@ -383,7 +387,7 @@ export default function Evaluation({ participantId, eventId, initialIsAnswerKey,
 
   useEffect(() => {
     if (roundId) {
-      resetForm();
+      resetForm(initialIsAnswerKey);
       setCanCloseRound(false);
       setDraftInfo(null);  // Limpar mensagem de rascunho quando novo round carrega
       // Scroll para o topo após o novo round ser carregado
@@ -447,6 +451,21 @@ export default function Evaluation({ participantId, eventId, initialIsAnswerKey,
       if (next) {
         setRoundId(next.id);
         setRoundName(next.name);
+        // se for Sommelier (gabarito), pré-preencher com dados do wine
+        if (initialIsAnswerKey) {
+          if ((next as any).wine_grapes) {
+            setWineGrapesList((next as any).wine_grapes as string[]);
+            // definir a uva principal como a primeira da lista para enviar ao backend
+            const first = ((next as any).wine_grapes as string[])[0] as Grape | undefined;
+            setGrape(first ?? null);
+          }
+          if ((next as any).wine_country) {
+            setCountry((next as any).wine_country as Country);
+          }
+          if ((next as any).wine_vintage != null) {
+            setVintage(String((next as any).wine_vintage));
+          }
+        }
         setWaiting(false);
       } else {
         setRoundId(null);
@@ -929,19 +948,23 @@ export default function Evaluation({ participantId, eventId, initialIsAnswerKey,
           <legend className="group-title">Uva Principal</legend>
 
           <div className="field">
-            <select
-              className="select select--clean"
-              value={grape ?? ""}
-              onChange={(e) => setGrape(e.target.value as Grape)}
-            >
-              <option value="">Selecione a uva</option>
+            {isAnswerKey && wineGrapesList && wineGrapesList.length > 0 ? (
+              <input className="input" value={wineGrapesList.join(', ')} disabled />
+            ) : (
+              <select
+                className="select select--clean"
+                value={grape ?? ""}
+                onChange={(e) => setGrape(e.target.value as Grape)}
+              >
+                <option value="">Selecione a uva</option>
 
-              {grapeOptions.map((g) => (
-                <option key={g} value={g}>
-                  {g}
-                </option>
-              ))}
-            </select>
+                {grapeOptions.map((g) => (
+                  <option key={g} value={g}>
+                    {g}
+                  </option>
+                ))}
+              </select>
+            )}
           </div>
         </fieldset>
 
@@ -954,6 +977,7 @@ export default function Evaluation({ participantId, eventId, initialIsAnswerKey,
               className="select select--clean"
               value={country ?? ""}
               onChange={(e) => setCountry(e.target.value as Country)}
+              disabled={isAnswerKey && !!country}
             >
               <option value="">Selecione o país</option>
 
@@ -980,6 +1004,7 @@ export default function Evaluation({ participantId, eventId, initialIsAnswerKey,
             min="1900"
             max={new Date().getFullYear()}
             onChange={(e) => setVintage(e.target.value)}
+            disabled={isAnswerKey && !!vintage}
           />
         </fieldset>
 

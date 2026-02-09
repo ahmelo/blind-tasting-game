@@ -1,9 +1,10 @@
-/* Event Answer Key Styles */
+/* Event Answer Key Styles - reuse participant result layout */
+@import "./participant_result.css";
 
 .answer-key-container {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1rem;
 }
 
 .answer-key-title {
@@ -14,28 +15,25 @@
 }
 
 .answer-key-round {
-  background: #ffffff;
-  border: 1px solid #e5e5e5;
+  /* use participant .round-card base but keep a small padding for visual spacing */
+  border: 1px solid #e5e7eb;
   border-radius: 8px;
-  padding: 2rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  margin-bottom: 0;
+  background: #fff;
+  padding: 0;
 }
 
 .answer-key-round h4 {
-  font-size: 1.3rem;
-  font-weight: 600;
-  color: #2c2c2c;
-  margin-bottom: 1.5rem;
-  padding-bottom: 0.75rem;
-  border-bottom: 2px solid #f0f0f0;
+  margin: 0;
+  font-size: 1rem;
 }
 
 /* Fieldset styling */
 .answer-key-group {
-  border: 1px solid var(--sv-border);
-  border-radius: 14px;
-  padding: 12px;
-  background: #fff;
+  margin-top: 0.6rem;
+  background: transparent;
+  border: none;
+  padding: 0;
 }
 
 .answer-key-group:last-of-type {
@@ -44,25 +42,19 @@
 
 .answer-key-group-title {
   display: block;
-  font-size: 1.05rem;
+  font-size: 0.95rem;
   font-weight: 600;
-  color: #1a1a1a;
-  padding: 0.75rem 1rem;
-  background: transparent;
-  border: none;
-  border-radius: 0;
-  
+  color: #111827;
+  padding: 0.5rem 0.75rem;
 }
 
 .answer-key-field {
   display: flex;
   justify-content: space-between;
   gap: 1rem;
-  padding: 0.75rem 0;
-  border-bottom: 1px solid #e8e8e8;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid #f3f4f6;
   align-items: center;
-
-
 }
 
 .answer-key-field:last-child {
@@ -76,7 +68,7 @@
 }
 
 .answer-key-value {
-  color: #1a1a1a;
+  color: #111827;
   font-weight: 500;
   font-size: 0.95rem;
   text-align: right;

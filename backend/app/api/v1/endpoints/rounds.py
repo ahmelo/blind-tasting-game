@@ -8,6 +8,7 @@ from app.schemas.winner import RoundWinner
 from app.schemas.round import RoundCreateRequest, RoundUpdateRequest, RoundResponse
 from app.models.round import Round
 from app.models.event import Event
+from app.models.wine import Wine
 from uuid import UUID
 from typing import List
 from app.services.round_service import RoundService
@@ -64,7 +65,21 @@ def get_round_winner(
 @router.get("/rounds")
 def list_rounds(event_id: UUID, db: Session = Depends(get_db)):
     rounds = db.query(Round).filter(Round.event_id == event_id).order_by(Round.position.asc()).all()
-    return [RoundResponse(id=r.id, name=r.name, position=r.position, is_open=r.is_open, event_id=r.event_id) for r in rounds]
+    result = []
+    for r in rounds:
+        wine = db.query(Wine).filter(Wine.round_id == r.id).first()
+        result.append(RoundResponse(
+            id=r.id,
+            name=r.name,
+            position=r.position,
+            is_open=r.is_open,
+            answer_released=r.answer_released,
+            event_id=r.event_id,
+            wine_grapes=wine.grapes if wine else None,
+            wine_country=wine.country.value if wine and wine.country else None,
+            wine_vintage=wine.vintage if wine else None
+        ))
+    return result
 
 @router.post("/rounds", response_model=RoundResponse, status_code=201)
 def create_round(payload: RoundCreateRequest, db: Session = Depends(get_db)):
@@ -81,7 +96,29 @@ def create_round(payload: RoundCreateRequest, db: Session = Depends(get_db)):
     db.add(r)
     db.commit()
     db.refresh(r)
-    return RoundResponse(id=r.id, name=r.name, position=r.position, is_open=r.is_open, event_id=r.event_id)
+    
+    # Criar o Wine (gabarito) se dados forem fornecidos
+    if payload.wine_grapes or payload.wine_country or payload.wine_vintage is not None:
+        wine = Wine(
+            round_id=r.id,
+            grapes=payload.wine_grapes,
+            country=payload.wine_country,
+            vintage=payload.wine_vintage
+        )
+        db.add(wine)
+        db.commit()
+    
+    return RoundResponse(
+        id=r.id,
+        name=r.name,
+        position=r.position,
+        is_open=r.is_open,
+        answer_released=r.answer_released,
+        event_id=r.event_id,
+        wine_grapes=payload.wine_grapes,
+        wine_country=payload.wine_country,
+        wine_vintage=payload.wine_vintage
+    )
 
 @router.patch("/rounds/{round_id}", response_model=RoundResponse)
 def update_round(round_id: UUID, payload: RoundUpdateRequest, db: Session = Depends(get_db)):
@@ -99,8 +136,20 @@ def update_round(round_id: UUID, payload: RoundUpdateRequest, db: Session = Depe
     db.add(r)
     db.commit()
     db.refresh(r)
+    
+    wine = db.query(Wine).filter(Wine.round_id == r.id).first()
 
-    return RoundResponse(id=r.id, name=r.name, position=r.position, is_open=r.is_open, event_id=r.event_id)
+    return RoundResponse(
+        id=r.id,
+        name=r.name,
+        position=r.position,
+        is_open=r.is_open,
+        answer_released=r.answer_released,
+        event_id=r.event_id,
+        wine_grapes=wine.grapes if wine else None,
+        wine_country=wine.country.value if wine and wine.country else None,
+        wine_vintage=wine.vintage if wine else None
+    )
 
 @router.delete("/rounds/{round_id}", status_code=204)
 def delete_round(round_id: UUID, db: Session = Depends(get_db)):

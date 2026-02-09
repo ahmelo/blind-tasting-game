@@ -15,11 +15,17 @@ class Round(Base):
     position = Column(Integer, nullable=False, default=1)
     is_open = Column(Boolean, nullable=False, default=True)
     answer_released = Column(Boolean, nullable=False, default=False)
-    event = relationship("Event", back_populates="rounds")
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
-
+    
+    event = relationship("Event", back_populates="rounds")
     evaluations = relationship(
         "Evaluation",
         back_populates="round",
+        cascade="all, delete-orphan"
+    )
+    wine = relationship(
+        "Wine",
+        back_populates="round",
+        uselist=False,
         cascade="all, delete-orphan"
     )

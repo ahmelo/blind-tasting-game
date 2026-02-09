@@ -21,8 +21,18 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY app ./app
 COPY scripts ./scripts
 
+# Copia a configuração do Alembic
+COPY alembic.ini .
+COPY alembic ./alembic
+
+# Copia entrypoint que irá executar as migrações antes de iniciar o app
+COPY ./docker/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
 # Porta padrão do Render
 EXPOSE 10000
 
 # Start
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "10000", "--reload"]
+ENTRYPOINT ["/entrypoint.sh"]
+# CMD pode ser sobrescrito via Render (start command), mas deixamos padrão
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "10000"]
